@@ -84,6 +84,8 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	SharedPreferences ipp_pref;
 	SharedPreferences.Editor ipp_editor;
 	private String ipp_screen_name;
+	private String team_resource_id;
+
 
 
 	//メニューid
@@ -696,6 +698,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 			//int day = calendar.get(Calendar.DAY_OF_MONTH);
 			calendar.set(year, 1, 1, 0, 0, 0);
 			condition .setSince(calendar.getTimeInMillis() );
+			condition.setCount(10);
 			condition .setUntil(System.currentTimeMillis()); //今のタイムスタンプ ミリ秒単位なので注意
 			condition.build();
 			public_resource_client.query(LogItem.class, condition, new LogGetCallback()); //最初のよみこみ
