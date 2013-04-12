@@ -1,0 +1,930 @@
+package com.example.newecosns.cohesive;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
+import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
+import jp.innovationplus.ipp.client.IPPGeoLocationClient;
+import jp.innovationplus.ipp.core.IPPQueryCallback;
+import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
+import twitter4j.Status;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+import android.os.Bundle;
+import android.support.v4.content.Loader;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.example.newecosns.IPPLoginActivity;
+import com.example.newecosns.MainActivity;
+import com.example.newecosns.OAuthActivity;
+import com.example.newecosns.R;
+import com.example.newecosns.models.CommentItem;
+import com.example.newecosns.models.StressItem;
+import com.example.newecosns.utnils.Constants;
+import com.example.newecosns.utnils.NetworkManager;
+import com.example.newecosns.utnils.TwLoaderCallbacks;
+
+public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
+	static final String CALLBACK = "http://sns.uozias.jp";
+	static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
+	static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
+	static final int REQUEST_OAUTH = 1;
+	static final String hash_tag = "ecosns_test";
+	private static long user_id = 0L;
+	private static String screen_name = null;
+	private static String token = null;
+	private static String token_secret = null;
+
+
+	public String stress_now = StressItem.DEFAULT;
+
+
+	//IPPユーザデータ
+	SharedPreferences ipp_pref;
+	SharedPreferences.Editor ipp_editor;
+	private String ipp_auth_key;
+	private String ipp_id_string;
+	private String ipp_pass_string;
+	private String ipp_screen_name;
+	private String team_resource_id;
+	private int role_self  = 0;
+
+	//メニューid
+	private int tw_login_menu_id = 1;
+	private int ipp_login_menu_id = 2;
+	private int reload_menu_id = 3;
+	private int stress_change_menu_id = 4;
+	private int addget_menu_id = 5;
+
+	//twitter OAuthデータ保存用
+	SharedPreferences pref;
+	SharedPreferences.Editor editor;
+
+	Button twBtn = null;
+	Button updateBtn = null;
+	CheckBox tweetCheckBox = null;
+	ProgressBar waitBar =null;
+
+	//リスト末尾のタイムスタンプ
+	long last_timestamp = 0;
+
+
+	EditText twTx = null;
+	CohesiveCommentAdapter adapter = null;
+
+	//ロケーション関連
+		private LocationManager mLocationManager = null;
+		private Location mNowLocation = null;
+
+
+	private String TAG = "CommentFragment";
+
+	//入力チェック
+	private boolean user_inputted = false;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		View  view = inflater.inflate(R.layout.fragment_comment, container, false);
+        return view;
+
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		//IPPログインチェック
+		ippLoginCheck();
+
+
+
+
+	     //位置情報が利用できるか否かをチェック
+		prepareLocation();
+
+
+		//コメント投稿ボタンを押したら
+		prapareCommentSend();
+
+
+		//ツイートする チェックボックスをタップしたら
+		/*
+		tweetCheckBox = (CheckBox) getSherlockActivity().findViewById(R.id.check_tweet);
+		tweetCheckBox.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (tweetCheckBox.isChecked()) { //「ツイートする」にチェックが入っていたら
+					//ログインチェックとログイン画面への自動遷移
+					checkLoginTwitter();
+				}
+			}
+		});
+		*/
+
+
+		//アクションバー右上のメニュー切り替え
+		switch (MainActivity.mMenuType) {
+		case MainActivity.SummaryFragmentMenu:
+			MainActivity.mMenuType = MainActivity.CommentFragmentMenu;
+			break;
+		default:
+			break;
+		}
+		this.getSherlockActivity().supportInvalidateOptionsMenu();
+
+		//IPPからコメント読み込む
+		//更に読みこむ機能の実装
+		showCommentList(0);
+	}
+
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+
+
+	}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//ippログイン☑
+	private void ippLoginCheck(){
+		ipp_pref = getSherlockActivity().getSharedPreferences("IPP", Context.MODE_PRIVATE);
+		ipp_auth_key = ipp_pref.getString("ipp_auth_key", "");
+		ipp_id_string = ipp_pref.getString("ipp_id_string", "");
+		ipp_pass_string = ipp_pref.getString("ipp_pass","");
+		ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
+		team_resource_id = ipp_pref.getString("team_resource_id", "");
+		role_self = ipp_pref.getInt("role_self", 0);
+
+
+		//auth_keyがなければ
+		if(ipp_auth_key.equals("")){
+			//IPPログインに飛ばす
+		    Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
+		    startActivity(intent);
+		}else{
+			//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
+    		//result.setText(ipp_screen_name);
+		}
+	}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//位置情報関連
+	public void prepareLocation(){
+
+		mLocationManager = (LocationManager) getSherlockActivity().getSystemService(Context.LOCATION_SERVICE);
+		int counter = 0;
+		List<String> providers = mLocationManager.getProviders(true);
+		for (String provider : providers) {
+			if (provider.equals(LocationManager.GPS_PROVIDER) || provider.equals(LocationManager.NETWORK_PROVIDER)) {
+				counter++;
+			}
+		}
+		if (counter == 0) {
+			startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+		} else {
+			//位置情報登録
+			 //ローケーション取得条件の設定
+	        Criteria criteria = new Criteria();
+	        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+	        criteria.setPowerRequirement(Criteria.POWER_LOW);
+	        criteria.setSpeedRequired(true);
+	        criteria.setAltitudeRequired(false);
+	        criteria.setBearingRequired(false);
+	        criteria.setCostAllowed(false);
+
+
+			//一番いい（？）位置情報を更新し続ける
+	        final String bestProvider = mLocationManager.getBestProvider(criteria, true);
+	        mNowLocation = mLocationManager.getLastKnownLocation(bestProvider);
+	        mLocationManager.requestLocationUpdates(bestProvider, 1000, 1, this);
+
+		}
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//コメント投稿ボタンのイベント
+	private void prapareCommentSend(){
+
+
+		//入力欄にフォーカスすると内容はきえる
+		twTx = (EditText) getSherlockActivity().findViewById(R.id.editText);
+		twTx.setOnFocusChangeListener( new OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				Resources res = getResources();
+				if(((TextView) v).getText().toString().equals(res.getText(R.string.instruction_input_comment))){
+					((TextView) v).setText("");
+					user_inputted = true;
+				}
+
+
+			}
+		});
+		/*)
+		twTx.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((TextView) v).setText("");
+			}
+		});
+		*/
+
+		twBtn = (Button) getSherlockActivity().findViewById(R.id.tweetBtn);
+		twBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (v.getId() == R.id.tweetBtn) {
+
+					String tweetContent = twTx.getText().toString();
+					if (tweetContent.length() == 0 || user_inputted == false) {
+						Toast toast2 = Toast.makeText(getSherlockActivity().getApplicationContext(), "文を入力して下さい。",
+								Toast.LENGTH_LONG);
+						toast2.show();
+						return;
+					}else{
+						/*
+						if (tweetCheckBox.isChecked()) { //「ツイートする」にチェックが入っていたら
+							//ログインチェックとログイン画面への自動遷移
+							checkLoginTwitter();
+
+							//ツイート機能
+							if (tweetContent.length() > 140) {
+								Toast toast = Toast.makeText(getSherlockActivity().getApplicationContext(), "長過ぎます。",
+										Toast.LENGTH_LONG);
+								toast.show();
+							} else {
+
+								Bundle args = new Bundle(1); //onCreateLoaderに渡したい値はここへ
+								args.putString("tweetContent", tweetContent);
+								//getSherlockActivity().getSupportLoaderManager().initLoader(0, args, CommentFragment.this);　 //こっちは自分にローダーを実装する場合
+
+								TweetAsyncLoaderClass tweet_async_loader_class = new TweetAsyncLoaderClass(CommentFragment.this, token, token_secret, getSherlockActivity().getApplicationContext());
+								getLoaderManager().restartLoader(0, args, tweet_async_loader_class);
+							}
+						}
+						*/
+					}
+
+					//IPPへコメント投稿
+					CommentItem commentItem = new CommentItem();
+					commentItem.setCommentText(tweetContent);
+
+					//現在の日時
+					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+					commentItem.setCommentCreated(timestamp.toString());
+					commentItem.setTimestamp(timestamp.getTime());
+
+					//ユーザ名(IPP上の)
+					commentItem.setCommentUserName(ipp_id_string);
+
+					//スクリーンネーム
+					commentItem.setCommentScreenName(ipp_screen_name);
+
+					//緯度経度精度
+					commentItem.setLongitude(mNowLocation.getLongitude());
+					commentItem.setLatitude(mNowLocation.getLatitude());
+					commentItem.setAccuracy(mNowLocation.getAccuracy());
+					commentItem.setProvider(mNowLocation.getProvider());
+
+					//チームid
+					commentItem.setTeam_resource_id(team_resource_id);
+
+
+
+					//返信
+					TextView comment_parent_id_new = (TextView) CommentFragment.this.getSherlockActivity().findViewById(R.id.CommentParentIdNew);
+					commentItem.setCommentParentResourceId(comment_parent_id_new.getText().toString());
+
+					//送信
+					IPPApplicationResourceClient client = new IPPApplicationResourceClient(getSherlockActivity());
+					client.setAuthKey(ipp_auth_key);
+					client.setDebugMessage(true);
+
+					client.create(CommentItem.class, commentItem, new SendCommentCallback());
+
+					}
+				//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//debug
+
+			}
+
+		});
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//ログインチェック
+	public void checkLoginTwitter() {
+		pref = getSherlockActivity().getSharedPreferences("t4jdata", Context.MODE_PRIVATE);
+		token = pref.getString("token", "");
+		token_secret = pref.getString("token_secret", "");
+		screen_name = pref.getString("screen_name", "");
+		user_id = pref.getLong("user_id", 0L);
+		if (token.length() == 0) { //もし未認証だったら
+			Intent intent = new Intent(getSherlockActivity(), OAuthActivity.class);
+			intent.putExtra(OAuthActivity.CALLBACK, CALLBACK);
+			intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
+			intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+			startActivityForResult(intent, REQUEST_OAUTH);
+		}
+
+	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//ログイン用アクティビティから戻ってくるデータを保存
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == REQUEST_OAUTH && resultCode == 200) {
+			user_id = data.getLongExtra(OAuthActivity.USER_ID, 0);
+			screen_name = data.getStringExtra(OAuthActivity.SCREEN_NAME);
+
+			token = data.getStringExtra(OAuthActivity.TOKEN);
+			token_secret = data.getStringExtra(OAuthActivity.TOKEN_SECRET);
+			//認証データ保存
+			editor = pref.edit();
+			editor.putString("token", token);
+			editor.putString("token_secret", token_secret);
+			editor.putString("screen_name", screen_name);
+			editor.putLong("user_id", user_id);
+
+			editor.commit();
+
+		}
+	}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//コメント送信後のコールバック
+	public class SendCommentCallback implements IPPQueryCallback<String> {
+
+		@Override
+		public void ippDidError(int arg0) {
+			Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿失敗", Toast.LENGTH_LONG).show();
+
+		}
+
+		@Override
+		public void ippDidFinishLoading(String resource_id) {
+			Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿成功", Toast.LENGTH_LONG).show();
+			//ソフトキー外す
+			InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(
+					Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
+			((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
+
+			IPPGeoLocation geo_location = new IPPGeoLocation();
+			geo_location.setLongitude(mNowLocation.getLongitude());
+			geo_location.setLatitude(mNowLocation.getLatitude());
+			geo_location.setAccuracy(mNowLocation.getAccuracy());
+			geo_location.setTimestamp(mNowLocation.getTime());
+
+			geo_location.setProvider(mNowLocation.getProvider());
+			geo_location.setResource_id(resource_id);
+
+			IPPGeoLocationClient geo_location_client = new IPPGeoLocationClient(getSherlockActivity());
+			geo_location_client.setAuthKey(ipp_auth_key);
+			geo_location_client.create(geo_location, new geoPostCallback());
+
+			showCommentList(0);
+
+		}
+
+	}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	//位置情報送信後のコールバック
+	class geoPostCallback implements IPPQueryCallback<String> {
+
+	@Override
+		public void ippDidError(int arg0) {
+			Log.d(TAG, getString(arg0));
+
+		}
+
+
+		@Override
+		public void ippDidFinishLoading(String arg0) {
+			Log.d(TAG, arg0);
+		}
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//オプションメニューの追加
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+		super.onCreateOptionsMenu(menu, inflater);
+
+		/*
+		//ツイッターログイン
+		MenuItem tw_login = menu.add(0, tw_login_menu_id, Menu.NONE, getString(R.string.tw_setting));
+		tw_login.setIcon(android.R.drawable.ic_menu_preferences);
+		tw_login.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	*/
+		//IPPログイン
+		MenuItem ipp_login = menu.add(0, ipp_login_menu_id, Menu.NONE, getString(R.string.ipp_login));
+		ipp_login.setIcon(android.R.drawable.ic_menu_preferences);
+		ipp_login.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		//リロード
+		MenuItem reload = menu.add(0, reload_menu_id, Menu.NONE, getString(R.string.comment_reload));
+		reload.setIcon(android.R.drawable.ic_menu_preferences);
+		reload.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		//追加読み込み
+		MenuItem addget = menu.add(0, addget_menu_id, Menu.NONE, getString(R.string.additionalGet));
+		addget.setIcon(android.R.drawable.ic_menu_preferences);
+		addget.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		//ストレス変更
+		/*
+		MenuItem stress_change = menu.add(0, stress_change_menu_id, Menu.NONE, getString(R.string.stress_change));
+		stress_change.setIcon(android.R.drawable.ic_menu_preferences);
+		stress_change.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+*/
+
+	}
+
+
+	//メニューを選んだ時の操作
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		//ツイッターログイン
+		if (item.getItemId() == tw_login_menu_id) {
+			//ログアウト
+			//認証データをカラに
+			pref = getSherlockActivity().getSharedPreferences("t4jdata", Context.MODE_PRIVATE);
+			editor = pref.edit();
+			editor.putString("token","");
+			editor.putString("token_secret","");
+			editor.putString("screen_name","");
+			checkLoginTwitter();
+		}
+
+		//IPPログイン
+		if(item.getItemId() == ipp_login_menu_id){
+			Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
+		    startActivity(intent);
+		    //スクリーンネーム消す
+        	//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
+    		//result.setText("");
+		}
+
+		//リロード
+		if (item.getItemId() == reload_menu_id) {
+			showCommentList(0);
+
+		}
+
+
+		//追加読み込み
+		if(item.getItemId() == addget_menu_id){
+
+			long until = last_timestamp;
+			try{
+				waitBar.setVisibility(View.VISIBLE);
+			}catch (NullPointerException e){
+
+			}
+			showCommentList(until);
+		}
+
+		//ストレス変更
+		/*
+
+		if(item.getItemId() == stress_change_menu_id){
+
+			//メインアクティビティに教えてやる
+			 Intent intent = new Intent(getSherlockActivity(), MainActivity.class);
+			 intent.putExtra("stress_now", MainActivity.RELAXED); //このフラグメントは密な方なので、ゆるい方にしか変わらない
+			 startActivity(intent);
+
+		}
+		*/
+
+	return false;
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//IPPからコメント読み込むメソッド
+	public void showCommentList(long until) {
+		//オンラインなら外部DBから他人のデータ読み出し//
+		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
+
+		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
+
+			if(ipp_auth_key.length() > 0){
+				IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
+				public_resource_client.setAuthKey(ipp_auth_key);
+
+				QueryCondition condition = new QueryCondition();
+
+				Calendar calendar = Calendar.getInstance();
+				int year = calendar.get(Calendar.YEAR);
+				//int month = calendar.get(Calendar.MONTH);
+				//int day = calendar.get(Calendar.DAY_OF_MONTH);
+				calendar.set(year, 1, 1, 0, 0, 0);
+
+				condition.setCount(10);
+
+				condition.setSince(calendar.getTimeInMillis()); //今日の0時0分
+				//public_resource_client.setSince(0);
+				if(until == 0){
+					condition.setUntil(System.currentTimeMillis()); //今のタイムスタンプ ミリ秒単位なので注意
+					condition.build();
+					public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback()); //最初
+				}else{
+					condition.setUntil(until);
+					condition.build();
+					public_resource_client.query(CommentItem.class,condition, new AdditionalCommentGetCallback()); //追加
+				}
+
+
+			}
+		}
+
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//コメント取得コールバック
+	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
+
+		@Override
+		public void ippDidError(int paramInt) {
+			Toast.makeText(CommentFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
+			//IPPプラットフォームから取得したコメントのリスト
+			//そのままだと配列なので、リストにする
+			List<CommentItem> CommentItemList = new ArrayList<CommentItem>();
+
+			CommentItem comment_item=null;
+			for ( int i = 0; i < comment_item_array.length; ++i ) {
+				comment_item=  comment_item_array[i];
+				CommentItemList.add(comment_item);
+			}
+			if(comment_item != null){
+				last_timestamp = comment_item.getTimestamp(); //最後の要素のタイムスタンプを得る
+			}
+
+			ListView listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView
+
+
+			adapter = new CohesiveCommentAdapter(getSherlockActivity().getApplicationContext(), CommentItemList, team_resource_id, role_self);
+
+			try{
+				listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+				listView.setAdapter(adapter);
+				//終わったら成功のトースト出す
+				Toast toast = Toast.makeText(getSherlockActivity(), "コメント読み込み成功", Toast.LENGTH_LONG);
+				toast.show();
+			} catch (NullPointerException e){
+				Log.d("BACK GROUND", "writing timeline error");
+			}
+
+			//プログレスバー隠す
+			try{
+				waitBar.setVisibility(View.GONE);
+			}catch (NullPointerException e){
+
+			}
+		}
+
+	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//コメント追加取得コールバック
+	public class AdditionalCommentGetCallback implements IPPQueryCallback<CommentItem[]> {
+
+		@Override
+		public void ippDidError(int paramInt) {
+			Toast.makeText(CommentFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
+
+			for ( int i = 0; i < comment_item_array.length; ++i ) {
+				adapter.add(comment_item_array[i]);
+			}
+			try{
+				waitBar.setVisibility(View.GONE);
+			}catch (NullPointerException e){
+
+			}
+		}
+	}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public class CohesiveCommentAdapter extends ArrayAdapter<CommentItem> {
+		private LayoutInflater mInflater;
+		private Context context;
+
+		private Button replyBtn = null;
+		private Button showConversationBtn  = null;
+
+		private String team_resource_id = null;
+		private int role_self = 0;
+
+		public CohesiveCommentAdapter(Context context, List<CommentItem> comments) {
+			super(context, 0, comments);
+			mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			this.context = context;
+
+		}
+
+		public CohesiveCommentAdapter(Context context, List<CommentItem> comments,  String team_resource_id, int role_self) {
+			super(context, 0, comments);
+			mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			this.context = context;
+			this.team_resource_id  = team_resource_id;
+			this.role_self = role_self;
+
+
+		}
+
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+
+
+			//データが入ってるオブジェクトをとる
+			final CommentItem item = this.getItem(position);
+
+			if(convertView == null){
+				convertView = mInflater.inflate(R.layout.row_comment_cohesive, null);
+			}
+
+
+			//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
+			if(team_resource_id != null && role_self != 0){
+				//自分側チームの時
+				if(item.getTeam_resource_id().equals(team_resource_id)){
+					switch(role_self){
+						case Constants.KOHAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+							break;
+						case Constants.SENPAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+							break;
+						case Constants.RELAXED_ROLE:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+							break;
+
+					}
+				//相手側チーム(というか自分のチーム以外)のとき
+				}else{
+					switch(role_self){
+					case Constants.KOHAI:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+						break;
+					case Constants.SENPAI:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+						break;
+					case Constants.RELAXED_ROLE:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+						break;
+
+					}
+
+				}
+			}else{
+				convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+
+			}
+
+
+
+			//ビューに値をセット
+			((TextView) convertView.findViewById(R.id.CommentScreenNameInList)).setText(item.getCommentScreenName());
+			((TextView) convertView.findViewById(R.id.CommentTextInList)).setText(item.getCommentText());
+
+			//日付は最初からストリング yyyy-MM-dd HH:mm:ss
+			((TextView) convertView.findViewById(R.id.CommentCreatedInList)).setText(item.getCommentCreated());
+
+
+			//resourceId, parentResourceIdは隠しビュー
+			TextView resourceid = (TextView)convertView.findViewById(R.id.CommentResourceIdInList);
+			resourceid.setText(item.getResource_id());
+			resourceid.setVisibility(View.GONE);
+
+			TextView parentresourceid = (TextView)convertView.findViewById(R.id.CommentParentResourceIdInList);
+			parentresourceid.setText(item.getCommentParentResourceId());
+			parentresourceid.setVisibility(View.GONE);
+
+
+
+			//返信先表示
+			showConversationBtn = (Button) convertView.findViewById(R.id.showConversation);
+			if (parentresourceid.getText().length() != 0){
+
+				showConversationBtn.setVisibility(View.VISIBLE);
+
+
+				showConversationBtn.setOnClickListener(new GetConversationListener(item));
+
+
+
+
+
+
+			}else{//会話を表示」メニュー
+				showConversationBtn.setVisibility(View.GONE);
+			}
+
+
+
+
+
+
+			//返信ボタンをタップしたら
+			replyBtn = (Button) convertView.findViewById(R.id.replyBtn);
+			replyBtn.setOnClickListener(new setReplyTarget(item));
+
+			return convertView;
+		}
+
+	}
+
+
+	public class GetConversationListener implements View.OnClickListener{
+
+
+		CommentItem item = null;
+
+
+		public GetConversationListener (CommentItem item){
+			this.item = item;
+
+		}
+
+		@Override
+		public void onClick(View v) {
+			//返信関係にあるコメントを全部とってきて表示するアクティビティを立ち上げる
+			Intent intent = new Intent(getActivity(), RepliesActivity.class);
+			intent.putExtra("resource_id", item.getResource_id());
+			intent.putExtra("parent_resource_id", item.getCommentParentResourceId());
+			intent.putExtra("stress_now", stress_now);
+			startActivityForResult(intent,1);
+			getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
+		}
+
+
+
+	}
+
+
+
+	public class setReplyTarget implements View.OnClickListener {
+		CommentItem item = null;
+
+
+		public setReplyTarget(CommentItem item){
+			this.item = item;
+		}
+
+		@Override
+		public void onClick(View v) {
+
+			//返信先の表示
+			TextView reply_for = (TextView) CommentFragment.this.getSherlockActivity().findViewById(R.id.reply_for);
+			reply_for.setText(item.getCommentScreenName()+"「" + item.getCommentText() + "」への返信");
+
+			reply_for.setVisibility(View.VISIBLE);
+			View list_element = (View) v.getParent().getParent();
+			TextView comment_parent_id_new = (TextView) CommentFragment.this.getSherlockActivity().findViewById(R.id.CommentParentIdNew);
+			CharSequence resource_id = ((TextView) list_element.findViewById(R.id.CommentResourceIdInList)).getText();
+
+			//一度全要素を未選択に
+			ViewGroup listView = (ViewGroup) list_element.getParent();
+			for (int i = 0; i < listView.getChildCount() ; i++){
+				listView.getChildAt(i).setSelected(false);
+			}
+
+			//今入力しているコメントの返信先を選択中のコメントに設定
+			comment_parent_id_new.setText(resource_id);
+			list_element.setSelected(true);
+		}
+
+
+	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//位置情報関連
+
+	//位置更新時の処理
+	@Override
+	public void onLocationChanged(Location location) {
+		mNowLocation = location;
+	}
+
+	@Override
+	public void onProviderDisabled(String arg0) {
+		//TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	@Override
+	public void onProviderEnabled(String arg0) {
+		//TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	@Override
+	public void onStatusChanged(String arg0, int status, Bundle arg2) {
+		switch (status) {
+		case LocationProvider.AVAILABLE:
+			break;
+		case LocationProvider.OUT_OF_SERVICE:
+			break;
+		case LocationProvider.TEMPORARILY_UNAVAILABLE:
+			break;
+		}
+	}
+
+	//アプリを止めたら
+	@Override
+	public void onPause() {
+		if (mLocationManager != null) {
+			mLocationManager.removeUpdates(this);
+		}
+		super.onPause();
+	}
+
+
+
+	@Override
+	public void TweetLoaderCallbacks(Status result, Loader<Status> paramLoader) {
+		getLoaderManager().destroyLoader(paramLoader.getId());//ツイートしたら破棄
+		//ソフトキー外す
+		InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(
+				Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
+		((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
+
+
+
+	}
+
+}
+
+
+
+

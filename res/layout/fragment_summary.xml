@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <!-- 月選択メニュー -->
+
+    <LinearLayout
+        android:id="@+id/top_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/previous_month"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/button_left" />
+
+        <Button
+            android:id="@+id/summary_month"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button_this_month"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/this_month"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/next_month"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/button_right" />
+    </LinearLayout>
+
+    <!-- 入力画面へのリンクボタン -->
+
+    <LinearLayout
+        android:id="@+id/bottom_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/inputLogBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/input_log" />
+    </LinearLayout>
+
+    <!-- まとめ等各種情報 -->
+
+    <LinearLayout
+        android:id="@+id/summary_list_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_control_bar"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/summary_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ProgressBar
+            android:id="@+id/waitBarInSummaryList"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal" />
+    </LinearLayout>
+
+    <!-- ログのタイムライン -->
+
+    <LinearLayout
+        android:id="@+id/log_timeline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/summary_list_wrapper"
+        android:layout_below="@id/top_control_bar"
+        android:orientation="vertical"
+
+         >
+
+            <ListView
+                android:id="@+id/log_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="@string/no_data"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ProgressBar
+                android:id="@+id/waitBarInLogList"
+                style="?android:attr/progressBarStyleLargeInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/instruction_peb_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/green"
+        android:gravity="center_horizontal"
+        android:text="@string/instruction_peb_list"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:id="@+id/radiogroup"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp" >
+
+        <RadioButton
+            android:id="@+id/button_indoor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:tag="indoor"
+            android:text="@string/button_indoor"
+            android:textSize="14sp" />
+
+        <RadioButton
+            android:id="@+id/button_log_purchase"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:tag="purchase"
+            android:text="@string/button_log_purchase"
+            android:textSize="14sp" />
+
+        <RadioButton
+            android:id="@+id/button_outdoor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:tag="outdoor"
+            android:text="@string/button_outdoor"
+            android:textSize="14sp" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:background="@color/light_gray"
+        android:orientation="vertical"
+        android:padding="4dp" >
+
+        <ListView
+            android:id="@+id/PEBList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@id/android:empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ProgressBar
+            android:id="@+id/ProgressBarInPEBList"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/ScrollViewInputLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" >
+
+        <LinearLayout
+            android:id="@+id/LinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TableRow
+                    android:id="@+id/tableRow3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/InputLogCreatedLabels"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/input_log_item_created"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/InputLogCreated"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:ems="10"
+                        android:gravity="center"
+
+                        android:textSize="18sp" />
+                </TableRow>
+
+			<!--PEBの名前 -->
+                <TableRow
+                    android:id="@+id/table_row_peb_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/label_peb_selected_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/label_peb_selected_name"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/product_peb_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:inputType="text"
+                        android:textSize="18sp" />
+                </TableRow>
+
+                <!--製品名 -->
+                <TableRow
+                    android:id="@+id/table_row_product_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/label_product_selected_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/label_product_selected_name"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/product_selected_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:inputType="text"
+                        android:textSize="18sp" />
+                </TableRow>
+
+ 				 <!--生産者 -->
+                 <TableRow
+                    android:id="@+id/table_row_product_selected_producer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/label_product_selected_producer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/label_product_selected_producer"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/product_selected_producer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:inputType="text"
+                        android:textSize="18sp" />
+                </TableRow>
+
+
+
+
+                <!--価格  -->
+                <TableRow
+                    android:id="@+id/table_row_product_selected_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/label_product_selected_price"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/label_product_selected_price"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/product_selected_price"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:ems="10"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:textSize="18sp" />
+                </TableRow>
+
+                <!-- 環境ラベル  -->
+                <TableRow
+                    android:id="@+id/table_row_product_selected_mark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/label_product_selected_mark"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/green"
+                        android:gravity="center"
+                        android:text="@string/label_product_selected_mark"
+                        android:textSize="18sp" />
+
+                    <Spinner
+                        android:id="@+id/product_selected_mark"
+                        android:layout_weight="3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/prompt_product_selected_mark" />
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/inputFixBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/input_fix" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <CheckBox
+                    android:id="@+id/offline_log"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:text="@string/outer_log" />
+
+                <CheckBox
+                    android:id="@+id/check_tweet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:gravity="center"
+                    android:text="@string/check_tweet"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/takePicBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/take_picture" />
+
+            <ImageView
+                android:id="@+id/pictureImageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_gallery" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

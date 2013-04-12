@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/fuki_relaxed"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/screen_name_in_log_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/black"
+        android:textSize="14sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/InputLogNameInList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/bg_row_log_title"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="20sp" >
+    </TextView>
+
+    <!-- CO2 -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:id="@+id/LogCo2WrapperInList"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/input_log_item_co2_label"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/InputLogCo2AmountInList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="6dp"
+            android:text="@string/input_log_item_co2_amount"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+     <!-- 節約金額 -->
+
+    <LinearLayout
+        android:id="@+id/LogAmountWrapperInList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/input_log_item_money_label"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/InputLogAmountInList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_log_item_money_amount"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- かけた金額 -->
+
+    <LinearLayout
+        android:id="@+id/LogPriceWrapperInList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/input_log_item_price_label"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/InputLogPriceInList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_log_item_price_after"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    	<!-- カテゴリ -->
+    <TextView
+        android:id="@+id/InputLogCategoryInList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:visibility="gone" >
+    </TextView>
+
+      <!-- 場所 -->
+    <TextView
+        android:id="@+id/InputLogPlaceInList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:visibility="gone">
+    </TextView>
+
+     <!-- 日時 -->
+
+    <TextView
+        android:id="@+id/InputLogCreatedInList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textColor="@color/black" >
+    </TextView>
+
+    <ImageView
+        android:id="@+id/pictureInList"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:scaleType="centerInside" />
+
+    <ProgressBar
+        android:id="@+id/ProgressBarInList"
+        style="?android:attr/progressBarStyleSmallInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal" />
+
+    <!-- 以下隠し要素 -->
+
+    <TextView
+        android:id="@+id/InputLogIdInList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:visibility="gone" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/InputLogIdInUserInList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:visibility="gone" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/InputLogPebIdInList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:visibility="gone" >
+    </TextView>
+
+</LinearLayout>
