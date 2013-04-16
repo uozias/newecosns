@@ -6,6 +6,7 @@
 
 
       <!-- 月選択メニュー -->
+      <!--  と先輩・後輩表示 -->
 
     <LinearLayout
         android:id="@+id/top_control_bar"

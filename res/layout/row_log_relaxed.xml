@@ -5,16 +5,44 @@
     android:background="@drawable/fuki_relaxed"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/screen_name_in_log_list"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/black"
-        android:textSize="14sp" >
-    </TextView>
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/screen_name_in_log_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
+
+         <TextView
+	       android:text="@string/screen_name_in_label_after"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="left"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="5dp"
+	        android:textColor="@color/black"
+	        android:textSize="14sp" >
+	    </TextView>
+
+                 <TextView
+	       android:text="@string/name_model_log"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="left"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="5dp"
+	        android:textColor="@color/black"
+	        android:textSize="14sp" >
+	    </TextView>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/InputLogNameInList"
@@ -30,11 +58,11 @@
     <!-- CO2 -->
 
     <LinearLayout
+        android:id="@+id/LogCo2WrapperInList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:id="@+id/LogCo2WrapperInList"
         android:orientation="horizontal" >
 
         <TextView
@@ -61,7 +89,7 @@
             android:textColor="@color/black"
             android:textSize="14sp" />
     </LinearLayout>
-     <!-- 節約金額 -->
+    <!-- 節約金額 -->
 
     <LinearLayout
         android:id="@+id/LogAmountWrapperInList"
@@ -129,7 +157,8 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    	<!-- カテゴリ -->
+    <!-- カテゴリ -->
+
     <TextView
         android:id="@+id/InputLogCategoryInList"
         android:layout_width="fill_parent"
@@ -140,7 +169,8 @@
         android:visibility="gone" >
     </TextView>
 
-      <!-- 場所 -->
+    <!-- 場所 -->
+
     <TextView
         android:id="@+id/InputLogPlaceInList"
         android:layout_width="match_parent"
@@ -148,10 +178,10 @@
         android:gravity="left"
         android:textColor="@color/black"
         android:textSize="18sp"
-        android:visibility="gone">
+        android:visibility="gone" >
     </TextView>
 
-     <!-- 日時 -->
+    <!-- 日時 -->
 
     <TextView
         android:id="@+id/InputLogCreatedInList"

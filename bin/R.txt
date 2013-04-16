@@ -566,6 +566,8 @@ int string login_label 0x7f0a0055
 int string message_camera_cannot_used_in_inputlog 0x7f0a005d
 int string month_label_in_summary_fragment 0x7f0a0051
 int string my_summary 0x7f0a0033
+int string name_model_comment 0x7f0a0072
+int string name_model_log 0x7f0a0073
 int string new_peb 0x7f0a0065
 int string new_product 0x7f0a0064
 int string no_data 0x7f0a0011
@@ -575,6 +577,7 @@ int string outer_log 0x7f0a001d
 int string password_label 0x7f0a0052
 int string prompt_product_selected_mark 0x7f0a0069
 int string reply_to_comment 0x7f0a0036
+int string screen_name_in_label_after 0x7f0a0071
 int string screen_name_label 0x7f0a0054
 int string screen_name_label_in_summary_fragment 0x7f0a004c
 int string select_month 0x7f0a0044

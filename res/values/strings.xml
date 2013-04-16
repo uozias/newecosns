@@ -100,5 +100,8 @@
 	<string name="input_log_item_price_label">エコな商品にかけた金額</string>
 	<string name="input_log_item_price_amount">円</string>
 	<string name="input_log_item_product_producer_label_before">生産者</string>
+	<string name="screen_name_in_label_after">さんの</string>
+	<string name="name_model_comment">コメント</string>
+	<string name="name_model_log">エコ報告</string>
 
 </resources>

@@ -1289,6 +1289,8 @@ containing a value of this type.
         public static final int message_camera_cannot_used_in_inputlog=0x7f0a005d;
         public static final int month_label_in_summary_fragment=0x7f0a0051;
         public static final int my_summary=0x7f0a0033;
+        public static final int name_model_comment=0x7f0a0072;
+        public static final int name_model_log=0x7f0a0073;
         public static final int new_peb=0x7f0a0065;
         public static final int new_product=0x7f0a0064;
         public static final int no_data=0x7f0a0011;
@@ -1298,6 +1300,7 @@ containing a value of this type.
         public static final int password_label=0x7f0a0052;
         public static final int prompt_product_selected_mark=0x7f0a0069;
         public static final int reply_to_comment=0x7f0a0036;
+        public static final int screen_name_in_label_after=0x7f0a0071;
         public static final int screen_name_label=0x7f0a0054;
         public static final int screen_name_label_in_summary_fragment=0x7f0a004c;
         public static final int select_month=0x7f0a0044;
