@@ -1,5 +1,6 @@
 package com.example.newecosns.cohesive;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +11,12 @@ import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
 import jp.innovationplus.ipp.client.IPPGeoLocationClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
 import twitter4j.Status;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +54,7 @@ import com.example.newecosns.MainActivity;
 import com.example.newecosns.OAuthActivity;
 import com.example.newecosns.R;
 import com.example.newecosns.models.CommentItem;
+import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
@@ -76,6 +84,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private String ipp_screen_name;
 	private String team_resource_id;
 	private int role_self  = 0;
+	private String pair_common_id;
+	 List<PairItem> pair_item_list = null;
+	 String pair_item_list_string = null;
 
 	//メニューid
 	private int tw_login_menu_id = 1;
@@ -83,6 +94,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private int reload_menu_id = 3;
 	private int stress_change_menu_id = 4;
 	private int addget_menu_id = 5;
+
 
 	//twitter OAuthデータ保存用
 	SharedPreferences pref;
@@ -93,8 +105,13 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	CheckBox tweetCheckBox = null;
 	ProgressBar waitBar =null;
 
-	//リスト末尾のタイムスタンプ
+	//月選択・リスト表示関連
 	long last_timestamp = 0;
+    long until = 0L;
+    int target_month = 0;
+    int target_year = 0;
+
+    Button this_month = null;
 
 
 	EditText twTx = null;
@@ -158,6 +175,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		});
 		*/
 
+		//prepareChangeMonth();
 
 		//アクションバー右上のメニュー切り替え
 		switch (MainActivity.mMenuType) {
@@ -195,17 +213,32 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
 		team_resource_id = ipp_pref.getString("team_resource_id", "");
 		role_self = ipp_pref.getInt("role_self", 0);
+		pair_common_id = ipp_pref.getString("pair_common_id", "");
+		pair_item_list_string = ipp_pref.getString("pair_item_list_string", "");
 
-
-		//auth_keyがなければ
-		if(ipp_auth_key.equals("")){
-			//IPPログインに飛ばす
-		    Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
-		}else{
-			//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
-    		//result.setText(ipp_screen_name);
-		}
+		ObjectMapper localObjectMapper = new ObjectMapper();
+	    try
+	    {
+	      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
+	      if (this.ipp_auth_key.equals(""))
+	        startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
+	      return;
+	    }
+	    catch (JsonParseException localJsonParseException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonParseException.toString());
+	    }
+	    catch (JsonMappingException localJsonMappingException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonMappingException.toString());
+	    }
+	    catch (IOException localIOException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localIOException.toString());
+	    }
 	}
 
 
@@ -333,8 +366,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 					//チームid
 					commentItem.setTeam_resource_id(team_resource_id);
-
-
+					commentItem.setPair_common_id(CommentFragment.this.pair_common_id);
 
 					//返信
 					TextView comment_parent_id_new = (TextView) CommentFragment.this.getSherlockActivity().findViewById(R.id.CommentParentIdNew);
@@ -396,6 +428,10 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			editor.commit();
 
 		}
+
+		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }
 	}
 
 
@@ -600,6 +636,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //コメント取得コールバック
 	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
+
+
 
 		@Override
 		public void ippDidError(int paramInt) {
@@ -922,6 +960,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 }
 

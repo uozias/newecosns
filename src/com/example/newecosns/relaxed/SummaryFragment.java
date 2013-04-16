@@ -221,8 +221,12 @@ public class SummaryFragment extends SherlockFragment  {
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		//家計簿入力画面から帰ってきたら
 		//登録済み家計簿リスティング
-		showLogAndSummaryList(0,0);
 
+		if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }else{
+			  showLogAndSummaryList(0,0);
+		  }
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,8 +266,7 @@ public class SummaryFragment extends SherlockFragment  {
 		//auth_keyがなければ
 		if(ipp_auth_key.equals("")){
 			//IPPログインに飛ばす
-		    Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
+			startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
 		}
 
 	}
@@ -627,5 +630,7 @@ public class SummaryFragment extends SherlockFragment  {
 		       .setNegativeButton(android.R.string.cancel, null)
 		       .create();
 	}
+
+
 
 }

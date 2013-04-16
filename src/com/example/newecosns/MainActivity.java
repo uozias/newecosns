@@ -53,7 +53,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private long pair_start = 0L;
 	private long pair_end = 0L;
 
-	private static final int REQUEST_IPP_LOGIN = 3;
+	public static final int REQUEST_IPP_LOGIN = 3;
 
 
 	private String team_resource_id;

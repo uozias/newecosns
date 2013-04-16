@@ -1,5 +1,6 @@
 package com.example.newecosns.cohesive;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,6 +10,12 @@ import java.util.List;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -40,10 +47,12 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.InputLogActivity;
+import com.example.newecosns.MainActivity;
 import com.example.newecosns.R;
 import com.example.newecosns.models.LogAdapter;
 import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.PEBItem;
+import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.ProductItem;
 import com.example.newecosns.models.SummaryAdapter;
@@ -76,8 +85,10 @@ public class OthersLogFragment extends SherlockFragment {
 	private String ipp_screen_name;
 	private String team_resource_id;
 	private int role_self  = 0;
+	private String pair_common_id;
+	 List<PairItem> pair_item_list = null;
+	 String pair_item_list_string = null;
 
-	//ストレス状態 MainActivityが操作する
 	public String stress_now;
 
 	//UI
@@ -270,14 +281,32 @@ public class OthersLogFragment extends SherlockFragment {
 		ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
 		team_resource_id = ipp_pref.getString("team_resource_id", "");
 		role_self = ipp_pref.getInt("role_self", 0);
+		pair_common_id = ipp_pref.getString("pair_common_id", "");
+		pair_item_list_string = ipp_pref.getString("pair_item_list_string", "");
 
-
-		//auth_keyがなければ
-		if(ipp_auth_key.equals("")){
-			//IPPログインに飛ばす
-		    Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
-		}
+		ObjectMapper localObjectMapper = new ObjectMapper();
+	    try
+	    {
+	      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
+	      if (this.ipp_auth_key.equals(""))
+	        startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
+	      return;
+	    }
+	    catch (JsonParseException localJsonParseException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonParseException.toString());
+	    }
+	    catch (JsonMappingException localJsonMappingException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonMappingException.toString());
+	    }
+	    catch (IOException localIOException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localIOException.toString());
+	    }
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -721,6 +750,18 @@ private void makeDateOnlyPicker(){
 	       .setNegativeButton(android.R.string.cancel, null)
 	       .create();
 }
+
+	//ログイン用アクティビティから戻ってくるデータを保存
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+
+		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }
+	}
+
 
 
 }

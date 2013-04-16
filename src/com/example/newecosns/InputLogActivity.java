@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,6 +19,12 @@ import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
 import jp.innovationplus.ipp.client.IPPGeoLocationClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
 import twitter4j.Status;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -73,6 +80,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.MarkItem;
 import com.example.newecosns.models.PEBItem;
+import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.ProductItem;
 import com.example.newecosns.models.SummaryItem;
@@ -123,7 +131,10 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 	private String ipp_pass_string;
 	private String ipp_screen_name;
 	private String team_resource_id;
-
+	private String pair_common_id;
+	private int role_self;
+	 List<PairItem> pair_item_list = null;
+	 String pair_item_list_string = null;
 	//サマリー更新用
 	int sum = 0;
 	int summary_id = 0;
@@ -943,15 +954,33 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			ipp_pass_string = ipp_pref.getString("ipp_pass","");
 			ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
 			team_resource_id  = ipp_pref.getString("team_resource_id", "");
+			role_self = ipp_pref.getInt("role_self", 0);
+			pair_common_id = ipp_pref.getString("pair_common_id", "");
+			pair_item_list_string = ipp_pref.getString("pair_item_list_string", "");
 
-
-			//auth_keyがなければ
-			if(ipp_auth_key.equals("")){
-				//IPPログインに飛ばす
-			    Intent intent = new Intent(this, IPPLoginActivity.class);
-			    startActivity(intent);
-			}
-
+			ObjectMapper localObjectMapper = new ObjectMapper();
+		    try
+		    {
+		      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
+		      if (this.ipp_auth_key.equals(""))
+		        startActivityForResult(new Intent(this, IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
+		      return;
+		    }
+		    catch (JsonParseException localJsonParseException)
+		    {
+		      while (true)
+		        Log.d(this.TAG, localJsonParseException.toString());
+		    }
+		    catch (JsonMappingException localJsonMappingException)
+		    {
+		      while (true)
+		        Log.d(this.TAG, localJsonMappingException.toString());
+		    }
+		    catch (IOException localIOException)
+		    {
+		      while (true)
+		        Log.d(this.TAG, localIOException.toString());
+		    }
 		}
 
 
@@ -1153,7 +1182,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 
 			//チーム
 			log_item_edited.setTeam_resource_id(team_resource_id);
-
+			log_item_edited.setPair_common_id(team_resource_id);
 
 			//ログインチェックも兼ねる
 			if(ipp_id_string != null){
@@ -1792,6 +1821,10 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			}
 
 		}
+
+		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(this, MainActivity.class));
+		  }
 
 	}
 

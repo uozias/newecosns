@@ -1,6 +1,7 @@
 package com.example.newecosns.relaxed;
 
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -16,6 +17,12 @@ import jp.innovationplus.ipp.client.IPPGeoLocationClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPApplicationResource;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
 import twitter4j.Status;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +63,7 @@ import com.example.newecosns.OAuthActivity;
 import com.example.newecosns.R;
 import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.LogItem;
+import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.ImageCache;
@@ -85,8 +93,11 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	SharedPreferences.Editor ipp_editor;
 	private String ipp_screen_name;
 	private String team_resource_id;
+	private int role_self  = 0;
+	private String pair_common_id;
 
-
+	 List<PairItem> pair_item_list = null;
+	 String pair_item_list_string = null;
 
 	//メニューid
 	private int tw_login_menu_id = 1;
@@ -203,15 +214,36 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 		ipp_id_string = ipp_pref.getString("ipp_id_string", "");
 		ipp_pass_string = ipp_pref.getString("ipp_pass","");
 		ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
-		//auth_keyがなければ
-		if(ipp_auth_key.equals("")){
-			//IPPログインに飛ばす
-		    Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
-		}else{
-			//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
-    		//result.setText(ipp_screen_name);
-		}
+		team_resource_id = ipp_pref.getString("team_resource_id", "");
+		role_self = ipp_pref.getInt("role_self", 0);
+		pair_common_id = ipp_pref.getString("pair_common_id", "");
+		pair_item_list_string = ipp_pref.getString("pair_item_list_string", "");
+
+		ObjectMapper localObjectMapper = new ObjectMapper();
+	    try
+	    {
+	      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
+	      if (this.ipp_auth_key.equals(""))
+	        startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
+	      return;
+	    }
+	    catch (JsonParseException localJsonParseException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonParseException.toString());
+	    }
+	    catch (JsonMappingException localJsonMappingException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localJsonMappingException.toString());
+	    }
+	    catch (IOException localIOException)
+	    {
+	      while (true)
+	        Log.d(this.TAG, localIOException.toString());
+	    }
+
+
 	}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//ツイートする チェックボックスをタップしたら
@@ -345,8 +377,9 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 						commentItem.setAccuracy(mNowLocation.getAccuracy());
 						commentItem.setProvider(mNowLocation.getProvider());
 
-						//写真
-						//TODO
+						//チームid
+						commentItem.setTeam_resource_id(team_resource_id);
+						commentItem.setPair_common_id(pair_common_id);
 
 
 						//返信
@@ -412,6 +445,10 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 			editor.commit();
 
 		}
+
+		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }
 	}
 
 
