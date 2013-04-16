@@ -1182,7 +1182,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 
 			//チーム
 			log_item_edited.setTeam_resource_id(team_resource_id);
-			log_item_edited.setPair_common_id(team_resource_id);
+			log_item_edited.setPair_common_id(pair_common_id);
 
 			//ログインチェックも兼ねる
 			if(ipp_id_string != null){
@@ -1499,6 +1499,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 
 			//チーム
 			summary_item.setTeam_resource_id(team_resource_id);
+			summary_item.setPair_common_id(pair_common_id);
 
 			//更新,というかあげなおす
 			summary_client.create(SummaryItem.class, summary_item, new SummaryUpdateCallback());

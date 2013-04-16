@@ -3,7 +3,9 @@ package com.example.newecosns.cohesive;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
@@ -65,6 +67,7 @@ import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
+import com.example.newecosns.utnils.PublicResourceComparatorInverse;
 import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
@@ -118,7 +121,10 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	int target_year = 0;
 	int target_month = 0;
 	long last_timestamp = 0;
-    long until = 0L;
+
+	private long since;
+	private long until;
+
 
     ListView listView = null;
     Calendar calendar = null;
@@ -168,6 +174,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
 
 		calendar = Calendar.getInstance();
+
+		adapter = new CohesiveCommentAdapter(getSherlockActivity().getApplicationContext(), new ArrayList<CommentItem>(), team_resource_id, role_self);
+
 		//IPPログインチェック
 		ippLoginCheck();
 
@@ -627,34 +636,65 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
 
-			if(ipp_auth_key.length() > 0){
-				IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-				public_resource_client.setAuthKey(ipp_auth_key);
 
-				QueryCondition condition = new QueryCondition();
+			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
+			public_resource_client.setAuthKey(ipp_auth_key);
 
-				Calendar calendar = Calendar.getInstance();
-				int year = calendar.get(Calendar.YEAR);
-				//int month = calendar.get(Calendar.MONTH);
-				//int day = calendar.get(Calendar.DAY_OF_MONTH);
-				calendar.set(year, 1, 1, 0, 0, 0);
+			QueryCondition condition = new QueryCondition();
+			condition.setCount(10);
 
-				condition.setCount(10);
 
-				condition.setSince(calendar.getTimeInMillis()); //今日の0時0分
-				//public_resource_client.setSince(0);
+			//読みだすデータの日時の範囲を指定
+			int year = 0;
+			int month = 0;
+			long mUntil = 0;
+			this.until = until;
+
+
+			if(target_month == 0 && target_year == 0){
+				//今月1日のUNIXタイムスタンプ(ミリ秒)を取得
+				year = calendar.get(Calendar.YEAR);
+				month = calendar.get(Calendar.MONTH);
+				calendar.set(year, month, 1, 0, 0, 0);
+
+				since = calendar.getTimeInMillis(); //今月頭から
+
 				if(until == 0){
-					condition.setUntil(System.currentTimeMillis()); //今のタイムスタンプ ミリ秒単位なので注意
-					condition.build();
-					public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback()); //最初
+					mUntil = System.currentTimeMillis(); //現在まで
+
 				}else{
-					condition.setUntil(until);
-					condition.build();
-					public_resource_client.query(CommentItem.class,condition, new AdditionalCommentGetCallback()); //追加
+					mUntil = until;
+				}
+
+
+
+			}else{//月と日を指定されたら
+				adapter.clear();
+				year = target_year;
+				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
+				since = calendar.getTimeInMillis();
+
+				if(until == 0){
+					calendar.add(Calendar.MONTH, 1);
+					mUntil = calendar.getTimeInMillis(); //次の月の1日まで
+					calendar.add(Calendar.MONTH, -1); //戻しとく
+
+				}else{
+					mUntil = until;
 				}
 
 
 			}
+
+			condition.setSince(since);
+			condition.setUntil(mUntil);
+			condition.eq("pair_common_id",pair_common_id);
+
+			public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback()); //最初
+
+
+
+
 		}
 
 	}
@@ -674,62 +714,51 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
 			//IPPプラットフォームから取得したコメントのリスト
 			//そのままだと配列なので、リストにする
-			List<CommentItem> CommentItemList = new ArrayList<CommentItem>();
 
-			CommentItem comment_item=null;
-			for ( int i = 0; i < comment_item_array.length; ++i ) {
-				comment_item=  comment_item_array[i];
-				CommentItemList.add(comment_item);
+
+			if(comment_item_array.length != 0 ){
+				last_timestamp = comment_item_array[comment_item_array.length -1].getTimestamp() -1; //最後の要素のタイムスタンプを得る
+				List<CommentItem> CommentItemList = new ArrayList<CommentItem>(Arrays.asList(comment_item_array));
+				Collections.sort(CommentItemList, new PublicResourceComparatorInverse());
+
+				if(until == 0){ //初期よみこみ
+					adapter.addAll(CommentItemList);
+
+
+
+					try{
+						listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+						listView.setAdapter(adapter);
+						//終わったら成功のトースト出す
+						Toast toast = Toast.makeText(getSherlockActivity(), "コメント読み込み成功", Toast.LENGTH_LONG);
+						toast.show();
+
+					} catch (NullPointerException e){
+						Log.d("BACK GROUND", "writing timeline error");
+					}
+
+				}else{ //追加読み込み
+
+
+					adapter.addAll(CommentItemList);
+
+				}
+
 			}
-			if(comment_item != null){
-				last_timestamp = comment_item.getTimestamp(); //最後の要素のタイムスタンプを得る
-			}
 
 
-
-
-			adapter = new CohesiveCommentAdapter(getSherlockActivity().getApplicationContext(), CommentItemList, team_resource_id, role_self);
-
-			try{
-				listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-				listView.setAdapter(adapter);
-				//終わったら成功のトースト出す
-				Toast toast = Toast.makeText(getSherlockActivity(), "コメント読み込み成功", Toast.LENGTH_LONG);
-				toast.show();
-			} catch (NullPointerException e){
-				Log.d("BACK GROUND", "writing timeline error");
-			}
 
 			//プログレスバー隠す
 			try{
 				waitBar.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
 			}catch (NullPointerException e){
 
 			}
 		}
 
-	}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//コメント追加取得コールバック
-	public class AdditionalCommentGetCallback implements IPPQueryCallback<CommentItem[]> {
 
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(CommentFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-		}
 
-		@Override
-		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
-
-			for ( int i = 0; i < comment_item_array.length; ++i ) {
-				adapter.add(comment_item_array[i]);
-			}
-			try{
-				waitBar.setVisibility(View.GONE);
-			}catch (NullPointerException e){
-
-			}
-		}
 	}
 
 

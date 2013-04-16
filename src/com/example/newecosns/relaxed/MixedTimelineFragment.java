@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,6 +49,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -75,6 +76,7 @@ import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.ImageCache;
 import com.example.newecosns.utnils.NetworkManager;
+import com.example.newecosns.utnils.PublicResourceComparator;
 import com.example.newecosns.utnils.TweetTaskLoader;
 
 public class MixedTimelineFragment extends SherlockFragment implements LoaderCallbacks<Status>, LocationListener  {
@@ -127,7 +129,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	//リスト読み込み用
 	List<IPPApplicationResource> IPPPublicResourceList = null;
 
-
+	List<IPPApplicationResource>  IPPPublicResourceListTmp  = null;
 
 	ListView listView = null;
 	TextView twTx = null;
@@ -154,7 +156,10 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	int target_year = 0;
 	int target_month = 0;
 	long last_timestamp = 0;
-	long until = 0L;
+
+	private long since;
+	private long until;
+
 	CommentItem last_timestamp_holder_comment = null;
 	LogItem last_timestamp_holder_log = null;
 
@@ -185,13 +190,10 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	public void onStart() {
 		super.onStart();
 
+		//使いまわす変数の初期化
+		initListUI();
 
-		pictureViewList = new HashMap<String, ImageView>();
-		progressBarList = new HashMap<String, ProgressBar>();
 
-		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
-		listView = (ListView) MixedTimelineFragment.this.getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView //commentFragmtnの使い回し
-		calendar = Calendar.getInstance();
 
 		//IPPログインチェック
 		ippLoginCheck();
@@ -656,9 +658,8 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		//追加読み込み
 		if(item.getItemId() == addget_menu_id){
 
-			long until = last_timestamp;
-			waitBar.setVisibility(View.VISIBLE);
-			showMixedList(target_year, target_month, until);
+
+			showMixedList(target_year, target_month, last_timestamp);
 		}
 
 		//ストレス変更
@@ -678,6 +679,30 @@ class geoPostCallback implements IPPQueryCallback<String> {
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//リスト関連のビューなどの初期化
+	public void initListUI(){
+		pictureViewList = new HashMap<String, ImageView>();
+		progressBarList = new HashMap<String, ProgressBar>();
+
+		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
+		listView = (ListView) MixedTimelineFragment.this.getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView //commentFragmtnの使い回し
+		calendar = Calendar.getInstance();
+
+		IPPPublicResourceList = new ArrayList<IPPApplicationResource>();
+		adapter = new MixedAdapter(MixedTimelineFragment.this.getSherlockActivity().getApplicationContext(), IPPPublicResourceList);
+
+
+		try{
+			listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+			listView.setAdapter(adapter);
+		} catch (NullPointerException e){
+			Log.d(TAG, "writing list error");
+		}
+	}
+
+
+
 //IPPからコメント読み込むメソッド
 	public void showMixedList(int target_year, int target_month, long until) {
 		//オンラインなら外部DBから他人のデータ読み出し//
@@ -691,42 +716,71 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
 
-			if(ipp_auth_key.length() > 0){
-
-				//コメントの方
-				IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-				public_resource_client.setAuthKey(ipp_auth_key);
-				QueryCondition condition = new QueryCondition();
 
 
-				Calendar calendar = Calendar.getInstance();
-				int year = calendar.get(Calendar.YEAR);
-				//int month = calendar.get(Calendar.MONTH);
-				//int day = calendar.get(Calendar.DAY_OF_MONTH);
-				calendar.set(year, 1, 1, 0, 0, 0);
-				condition.setCount(10);
-
-				condition.setSince(calendar.getTimeInMillis()); //今日の0時0分
-				//public_resource_client.setSince(0);
-
-				//この辺り、流れが結構複雑
-				//追加じゃない場合、commentGetCallback→logGetCallback
-				//追加の場合、AdditionalCommentGetCallback→Additional
+			//コメントの方
+			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
+			public_resource_client.setAuthKey(ipp_auth_key);
+			QueryCondition condition = new QueryCondition();
+			condition.setCount(10);
 
 
+			//読みだすデータの日時の範囲を指定
+			int year = 0;
+			int month = 0;
+			long mUntil = 0;
+			this.until = until;
+
+			if(target_month == 0 && target_year == 0){
+				//今月1日のUNIXタイムスタンプ(ミリ秒)を取得
+				year = calendar.get(Calendar.YEAR);
+				month = calendar.get(Calendar.MONTH);
+				calendar.set(year, month, 1, 0, 0, 0);
+
+				since = calendar.getTimeInMillis(); //今月頭から
 
 				if(until == 0){
-					condition.setUntil(System.currentTimeMillis()); //今のタイムスタンプ ミリ秒単位なので注意
-					condition.build();
-					public_resource_client.query(CommentItem.class, condition, new CommentGetCallback()); //最初
+					mUntil = System.currentTimeMillis(); //現在まで
+
 				}else{
-					condition.setUntil(until);
-					condition.build();
-					public_resource_client.query(CommentItem.class,condition, new AdditionalCommentGetCallback(until)); //追加
+					mUntil = until;
+				}
+
+
+
+			}else{//月と日を指定されたら
+				year = target_year;
+				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
+				since = calendar.getTimeInMillis();
+				adapter.clear(); //リスト初期化
+
+				if(until == 0){
+					calendar.add(Calendar.MONTH, 1);
+					mUntil = calendar.getTimeInMillis(); //次の月の1日まで
+					calendar.add(Calendar.MONTH, -1); //戻しとく
+
+				}else{
+					mUntil = until;
 				}
 
 
 			}
+
+			condition.setSince(since);
+			condition.setUntil(mUntil);
+			condition.eq("pair_common_id",pair_common_id);
+
+			//この辺り、流れが結構複雑
+			//追加じゃない場合、commentGetCallback→logGetCallback
+			//追加の場合、AdditionalCommentGetCallback→Additional
+
+
+
+			public_resource_client.query(CommentItem.class, condition, new CommentGetCallback(mUntil)); //最初
+
+
+
+
 		}
 
 	}
@@ -737,6 +791,14 @@ class geoPostCallback implements IPPQueryCallback<String> {
 //コメント取得コールバック
 	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
 
+		private long mUntil = 0;
+
+		public CommentGetCallback(long until){
+			mUntil = until;
+
+		}
+
+
 		@Override
 		public void ippDidError(int paramInt) {
 			Toast.makeText(MixedTimelineFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
@@ -744,35 +806,33 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 		@Override
 		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
-			//IPPプラットフォームから取得したコメントのリスト
-			//そのままだと配列なので、リストにする
-			IPPPublicResourceList= new ArrayList<IPPApplicationResource>();
-
-			CommentItem comment_item=null;
-			for ( int i = 0; i < comment_item_array.length; ++i ) {
-				comment_item=  comment_item_array[i];
-				IPPPublicResourceList.add(comment_item);
-			}
-			if(comment_item != null){
-				last_timestamp = comment_item.getTimestamp(); //最後の要素のタイムスタンプを得る
-			}
-
 			//ログを読み込む
 			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
 			QueryCondition condition = new QueryCondition();
-
 			public_resource_client.setAuthKey(ipp_auth_key);
 			condition .setCount(10);
-			//今月中の内10件とりだすようにしている
 
-			Calendar calendar = Calendar.getInstance();
-			int year = calendar.get(Calendar.YEAR);
-			//int month = calendar.get(Calendar.MONTH);
-			//int day = calendar.get(Calendar.DAY_OF_MONTH);
-			calendar.set(year, 1, 1, 0, 0, 0);
-			condition .setSince(calendar.getTimeInMillis() );
-			condition.setCount(10);
-			condition .setUntil(System.currentTimeMillis()); //今のタイムスタンプ ミリ秒単位なので注意
+			//IPPプラットフォームから取得したコメントのリスト
+			//そのままだと配列なので、リストにする
+			IPPPublicResourceListTmp = new ArrayList<IPPApplicationResource>();
+			if(comment_item_array.length != 0){
+
+				IPPPublicResourceListTmp.addAll(Arrays.asList(comment_item_array));
+
+				last_timestamp_holder_comment = comment_item_array[comment_item_array.length -1];
+				last_timestamp = last_timestamp_holder_comment.getTimestamp() -1; //最後の要素のタイムスタンプを得る(1秒過去にしておく)
+
+				condition.setSince(last_timestamp);//一番古いコメントの入力時刻から
+
+			}else{
+				//これ以上古いコメントはないとき
+				condition.setSince(since); //月の初めから
+
+
+			}
+
+			condition.setUntil(mUntil); //コメント読み込み限界まで
+			condition.eq("pair_common_id",pair_common_id);
 			condition.build();
 			public_resource_client.query(LogItem.class, condition, new LogGetCallback()); //最初のよみこみ
 
@@ -790,33 +850,26 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		@Override
 		public void ippDidFinishLoading(LogItem[] log_item_array) {
 
+			if(log_item_array.length != 0){
+				IPPPublicResourceListTmp.addAll(Arrays.asList(log_item_array));
+				if(last_timestamp > log_item_array[log_item_array.length -1].getTimestamp()){
+					last_timestamp = log_item_array[log_item_array.length -1].getTimestamp() -1;
+				}
 
-
-
-			LogItem item = null;
-			for ( int i = 0; i < log_item_array.length; ++i ) {
-
-				item  =	log_item_array[i];
-				IPPPublicResourceList.add(item);
-			}
-			if(item != null){
-				last_timestamp = item.getTimestamp();
 			}
 
 
+			Collections.sort(IPPPublicResourceListTmp, new PublicResourceComparator());
+			adapter.addAll(IPPPublicResourceListTmp);
 
-			adapter = new MixedAdapter(MixedTimelineFragment.this.getSherlockActivity().getApplicationContext(), IPPPublicResourceList);
-			adapter.sort(new PublicResourceComparator());
+
+			//インジゲータ操作
 			try{
-				listView.setAdapter(adapter);
-			}catch( NullPointerException e){
-				Log.d(TAG, "ログ読み込みエラー");
-			}finally{
-				//プログレスバー隠す
 				waitBar.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
+			} catch (NullPointerException e){
+				Log.d(TAG, "writing list error");
 			}
-
-
 
 
 		}
@@ -830,81 +883,6 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 	}
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//コメント追加取得コールバック
-	public class AdditionalCommentGetCallback implements IPPQueryCallback<CommentItem[]> {
-
-		long until = 0;
-
-		public AdditionalCommentGetCallback(long until){
-			this.until = until;
-
-		}
-
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(MixedTimelineFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-		}
-
-		@Override
-		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
-
-			for ( int i = 0; i < comment_item_array.length; ++i ) {
-				adapter.add(comment_item_array[i]);
-			}
-			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-			QueryCondition condition = new QueryCondition();
-
-			public_resource_client.setAuthKey(ipp_auth_key);
-			Calendar calendar = Calendar.getInstance();
-			int year = calendar.get(Calendar.YEAR);
-			//int month = calendar.get(Calendar.MONTH);
-			//int day = calendar.get(Calendar.DAY_OF_MONTH);
-			calendar.set(year, 1, 1, 0, 0, 0);
-			condition.setCount(10);
-
-			condition.setSince(calendar.getTimeInMillis()); //今日の0時0分
-
-			condition.setUntil(until);
-			condition.build();
-			public_resource_client.query(LogItem.class,condition, new AdditionalLogGetCallback()); //追加
-
-			waitBar.setVisibility(View.GONE);
-		}
-	}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//IPPプラットフォーム上から追加でログを読み込むコールバック
-
-	private class AdditionalLogGetCallback implements IPPQueryCallback <LogItem[]>{
-
-		@Override
-		public void ippDidFinishLoading(LogItem[] log_item_array) {
-
-			List<IPPApplicationResource> additionalIPPPublicResourceList= new ArrayList<IPPApplicationResource>();
-			for ( int i = 0; i < log_item_array.length; ++i ) {
-				LogItem item = new LogItem();
-				item  =	log_item_array[i];
-				additionalIPPPublicResourceList.add(item);
-			}
-
-			//コメント読み込み
-
-			Collections.sort(additionalIPPPublicResourceList, new PublicResourceComparator());
-			adapter.addAll(additionalIPPPublicResourceList);
-
-		}
-
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(MixedTimelineFragment.this.getActivity(), "家計簿読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-
-		}
-
-
-	}
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1106,28 +1084,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 	}
 
-	///////////////////////////////////////////////////
-	//IPPPublicResouce用コンパレータ
 
-	public class PublicResourceComparator implements Comparator<IPPApplicationResource>{
-		int result = 0;
-
-		@Override
-		public int compare(IPPApplicationResource resourceA, IPPApplicationResource resourceB) {
-
-
-			if(resourceA.getTimestamp() < resourceB.getTimestamp()){
-				result =  1;
-			}
-			else if(resourceA.getTimestamp() > resourceB.getTimestamp()){
-				result = -1;
-			}
-			else if(resourceA.getTimestamp() == resourceB.getTimestamp()){
-				result = 0;
-			}
-			return result;
-		}
-	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //表示する月の変更
