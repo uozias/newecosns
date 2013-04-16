@@ -36,7 +36,11 @@ package com.example.newecosns;
 
 
 
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
@@ -45,6 +49,11 @@ import jp.innovationplus.ipp.client.IPPProfileClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPLoginResult;
 import jp.innovationplus.ipp.jsontype.IPPProfile;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -321,7 +330,7 @@ public class IPPLoginActivity extends Activity {
 				condition.setCount(20);//10より多ければ問題ないはずだが一応20にしとく
 				condition.eq("team_resource_id",teamItem.getResource_id().toString());
 
-				//condition.eq("team_resource_id","515b97470cf2352f719f2625"); //debug
+
 
 				condition.build();
 				//チームのteam_resource_idをparamsで指定
@@ -516,6 +525,8 @@ public class IPPLoginActivity extends Activity {
 					}
 				}
 			}
+			ArrayList<PairItem> localArrayList = new ArrayList<PairItem>(Arrays.asList(pair_items));
+
 			//相手のresource_idやら関係の有効期限をプレファレンスに保存
 			ipp_pref = context.getSharedPreferences("IPP", Context.MODE_PRIVATE);
 			ipp_editor = ipp_pref.edit();
@@ -524,14 +535,48 @@ public class IPPLoginActivity extends Activity {
 			ipp_editor.putInt("role_self",pair_item.getRole_self());
 			ipp_editor.putLong("pair_start",pair_item.getStart());
 			ipp_editor.putLong("pair_end",pair_item.getEnd());
+			 ipp_editor.putString("pair_resource_id", this.pair_item.getResource_id());
+	          ipp_editor.putString("pair_common_id", this.pair_item.getPair_common_id());
+
+	          String str = IPPLoginActivity.makeJSONString(localArrayList);
+
+	          ipp_editor.putString("pair_item_list", str);
+
 			ipp_editor.commit();
 
 			//MainActivityに戻る
-		    Intent intent = new Intent(IPPLoginActivity.this, MainActivity.class);
-		    startActivity(intent);
+		    Intent localIntent = new Intent(IPPLoginActivity.this, MainActivity.class);
+		    IPPLoginActivity.this.setResult(200, localIntent);
+	        finish();
 
 		}
 	}
+
+	//jsonつくる
+	 private static String makeJSONString(List<PairItem> paramList)
+	  {
+	    ObjectMapper localObjectMapper = new ObjectMapper();
+	    try
+	    {
+	      String str = localObjectMapper.writeValueAsString(paramList);
+	      return str;
+	    }
+	    catch (JsonGenerationException localJsonGenerationException)
+	    {
+	      Log.d("IPPLoginActivity", localJsonGenerationException.toString());
+	      return null;
+	    }
+	    catch (JsonMappingException localJsonMappingException)
+	    {
+	      Log.d("IPPLoginActivity", localJsonMappingException.toString());
+	      return null;
+	    }
+	    catch (IOException localIOException)
+	    {
+	      Log.d("IPPLoginActivity", localIOException.toString());
+	    }
+	    return null;
+	  }
 
 
 

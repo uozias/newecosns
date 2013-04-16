@@ -53,6 +53,8 @@ public class MainActivity extends SherlockFragmentActivity {
 	private long pair_start = 0L;
 	private long pair_end = 0L;
 
+	private static final int REQUEST_IPP_LOGIN = 3;
+
 
 	private String team_resource_id;
 
@@ -95,8 +97,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		loginCheck();
 
 
-		//ストレス状態の読みだし
-		readPairState();
+
 	}
 
 
@@ -136,6 +137,18 @@ public class MainActivity extends SherlockFragmentActivity {
 			}
 
 			//TODO IPPログインから
+			if(requestCode == REQUEST_IPP_LOGIN && resultCode == 200){
+				 this.ipp_pref = getSharedPreferences("IPP", 0);
+			      this.ipp_auth_key = this.ipp_pref.getString("ipp_auth_key", "");
+			      this.team_resource_id = this.ipp_pref.getString("team_resource_id", "");
+			      this.pair_resource_id = this.ipp_pref.getString("pair_resource_id", "");
+			      this.stress_now = this.ipp_pref.getString("stress_now", "");
+			      this.role_self = this.ipp_pref.getInt("role_self", 0);
+			      this.pair_start = this.ipp_pref.getLong("pair_start", 0L);
+			      this.pair_end = this.ipp_pref.getLong("pair_end", 0L);
+			      setBar();
+
+			}
 
 		}
 
@@ -164,7 +177,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			//圏外じゃなければ
 			if(NetworkManager.isConnected(this.getApplicationContext()) != false){
 			    Intent intent = new Intent(this, IPPLoginActivity.class);
-			    startActivity(intent);
+			    startActivityForResult(intent, REQUEST_IPP_LOGIN);
 
 			}
 		}
@@ -176,68 +189,27 @@ public class MainActivity extends SherlockFragmentActivity {
 			//圏外じゃなければ
 			if(NetworkManager.isConnected(this.getApplicationContext()) != false){
 			    Intent intent = new Intent(this, IPPLoginActivity.class);
-			    startActivity(intent);
+			    startActivityForResult(intent, REQUEST_IPP_LOGIN);
 
 			}
-		}
-
-
-
-
-	}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//プラットフォームからstress状態を読み出し
-
-	private void readPairState(){
-
-		//期限がすぎてるか、ストレス・ロールが無ければ再ログインさせることで取得させる
-		if(pair_end == 0 || pair_end < System.currentTimeMillis()){
-			Intent intent = new Intent(this, IPPLoginActivity.class);
-			startActivity(intent);
-
 		}else{
-			setBar();
+			if(pair_end == 0 || pair_end < System.currentTimeMillis()){
+				Intent intent = new Intent(this, IPPLoginActivity.class);
+				startActivityForResult(intent, REQUEST_IPP_LOGIN);
 
-		}
+			}else{
+				setBar();
 
-
-		/*
-		//チームからストレスを呼び出す
-		IPPApplicationResourceClient team_client = new IPPApplicationResourceClient(this);
-		team_client.setAuthKey(ipp_auth_key);
-		QueryCondition condition = new QueryCondition();
-		condition.eq("resource_id", team_resource_id);
-		condition.build();
-		team_client.query(TeamItem.class, condition, new TeamStressCallback());
-		*/
-
-
-
-	}
-
-	/*
-	private class TeamStressCallback implements IPPQueryCallback<TeamItem[]> {
-
-		@Override
-		public void ippDidError(int arg0) {
-			Log.d(TAG,"アプリ状態読み込み失敗");
-			setBar();//アクションバーの中身設定ブ
-
-		}
-
-		@Override
-		public void ippDidFinishLoading(TeamItem[] team_items) {
-			if(team_items.length != 0){
-				stress_now = team_items[0].getStress_now();
 			}
-			setBar();
+
 		}
 
+
+
+
 	}
-	*/
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -7,8 +7,10 @@ import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,10 +65,14 @@ public class SummaryFragment extends SherlockFragment  {
 	SQLiteDatabase peb_db= null;
 
 	//IPPユーザデータ
+	SharedPreferences ipp_pref;
+	SharedPreferences.Editor ipp_editor;
 	private String ipp_auth_key;
 	private String ipp_id_string;
 	private String ipp_pass_string;
 	private String ipp_screen_name;
+	private String team_resource_id;
+	private int role_self  = 0;
 
 	//ストレス状態 MainActivityが操作する
 	public String stress_now;
@@ -245,11 +251,14 @@ public class SummaryFragment extends SherlockFragment  {
 		/*
 		 * MainActivityからIPPログイン情報を受け取る
 		 */
-		ipp_auth_key = getArguments().getString("ipp_auth_key");
-		ipp_id_string = getArguments().getString("ipp_id_string");
-		ipp_pass_string = getArguments().getString("ipp_pass_string");
-		ipp_screen_name  = getArguments().getString("ipp_screen_name");
-		//stress_now = getArguments().getString("stress_now");
+		ipp_pref = getSherlockActivity().getSharedPreferences("IPP", Context.MODE_PRIVATE);
+		ipp_auth_key = ipp_pref.getString("ipp_auth_key", "");
+		ipp_id_string = ipp_pref.getString("ipp_id_string", "");
+		ipp_pass_string = ipp_pref.getString("ipp_pass","");
+		ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
+		team_resource_id = ipp_pref.getString("team_resource_id", "");
+		role_self = ipp_pref.getInt("role_self", 0);
+
 		//auth_keyがなければ
 		if(ipp_auth_key.equals("")){
 			//IPPログインに飛ばす

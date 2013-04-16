@@ -17,13 +17,13 @@ public class IPPWebViewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ippweb_view);
 
-		//webビューの設定
+
 		WebView webView = (WebView)findViewById(R.id.webview_in_ipp_webview);
 	    webView.setWebViewClient(new WebViewClient());
 	    Resources res = getResources();
 	    webView.loadUrl(res.getString(R.string.url_ipp_login));
 
-	    //mainActivityに戻るボタン
+
 	    Button button = (Button) findViewById(R.id.button_label_back_to_main_in_ippwebview);
 	    button.setOnClickListener(new OnClickListener() {
 

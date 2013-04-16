@@ -15,7 +15,7 @@ public class PairItem extends IPPApplicationResource {
 	long start = 0; //タイムスタンプミリ秒で開始日時
 	long end = 0; //タイムスタンプミリ秒で終了日時
 
-
+	String pair_common_id = null;
 
 
 	@Override
@@ -102,6 +102,26 @@ public class PairItem extends IPPApplicationResource {
 
 	public void setRole_self(int role_self) {
 		this.role_self = role_self;
+	}
+
+
+
+
+
+
+
+	public String getPair_common_id() {
+		return pair_common_id;
+	}
+
+
+
+
+
+
+
+	public void setPair_common_id(String pair_common_id) {
+		this.pair_common_id = pair_common_id;
 	}
 
 }
