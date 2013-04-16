@@ -5,41 +5,65 @@
     android:orientation="vertical" >
 
     <!-- 月選択メニュー -->
- <!--  と先輩・後輩表示 -->
+    <!-- と先輩・後輩表示 -->
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/top_control_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:orientation="horizontal" >
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/name_role_senpai"
+            android:background="@drawable/bg_label_senpai"
+            android:layout_margin="4dp"
+            android:layout_alignParentLeft="true"
+             android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/summary_month"
+            android:layout_width="48dp"
+            android:layout_height="34dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button_this_month"
+            android:layout_centerHorizontal="true"
+            android:text="@string/this_month"
+            android:textSize="22sp" />
+
 
         <Button
             android:id="@+id/previous_month"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:layout_toLeftOf="@id/summary_month"
             android:background="@drawable/button_left" />
 
-        <Button
-            android:id="@+id/summary_month"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/button_this_month"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/this_month"
-            android:textSize="22sp" />
 
         <Button
             android:id="@+id/next_month"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:layout_toRightOf="@id/summary_month"
             android:background="@drawable/button_right" />
-    </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_label_kouhai"
+            android:text="@string/name_role_kouhai"
+             android:textSize="22sp" />
+
+    </RelativeLayout>
 
     <!-- 入力画面へのリンクボタン -->
 
@@ -64,8 +88,8 @@
         android:id="@+id/summary_list_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/top_control_bar"
         android:layout_above="@id/bottom_control_bar"
+        android:layout_below="@id/top_control_bar"
         android:orientation="vertical" >
 
         <ListView
@@ -89,7 +113,5 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal" />
     </LinearLayout>
-
-
 
 </RelativeLayout>

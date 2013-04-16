@@ -103,5 +103,7 @@
 	<string name="screen_name_in_label_after">さんの</string>
 	<string name="name_model_comment">コメント</string>
 	<string name="name_model_log">エコ報告</string>
+	<string name="name_role_senpai">先輩</string>
+	<string name="name_role_kouhai">後輩</string>
 
 </resources>
