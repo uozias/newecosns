@@ -85,7 +85,7 @@
     <string name="button_outdoor">屋外その他</string>
     <string name="button_log_peb">節約・工夫</string>
     <string name="button_log_purchase">商品購入</string>
-    <string name="input_log_item_product_mark_label_after">製品</string>
+    <string name="input_log_item_product_mark_label_before">ラベル:</string>
     <string name="new_product">リストにない商品を登録</string>
     <string name="new_peb">リストにないエコ行動を登録</string>
     <string name="label_product_selected_price">価格</string>
@@ -99,5 +99,6 @@
 	<string name="input_log_item_price_after">円</string>
 	<string name="input_log_item_price_label">エコな商品にかけた金額</string>
 	<string name="input_log_item_price_amount">円</string>
+	<string name="input_log_item_product_producer_label_before">生産者</string>
 
 </resources>

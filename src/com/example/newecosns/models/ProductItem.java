@@ -13,6 +13,10 @@ public class ProductItem extends IPPApplicationResource {
 	int producer_id = 0;
 	int mark_id = 0;
 
+	String team_resource_id = null;
+	String pair_resource_id = null;
+	String pair_common_id = null;
+
 	@Override
 	@JsonIgnore
 	public String getResourceName() {
@@ -68,6 +72,30 @@ public class ProductItem extends IPPApplicationResource {
 
 	public void setProducer_id(int producer_id) {
 		this.producer_id = producer_id;
+	}
+
+	public String getTeam_resource_id() {
+		return team_resource_id;
+	}
+
+	public void setTeam_resource_id(String team_resource_id) {
+		this.team_resource_id = team_resource_id;
+	}
+
+	public String getPair_resource_id() {
+		return pair_resource_id;
+	}
+
+	public void setPair_resource_id(String pair_resource_id) {
+		this.pair_resource_id = pair_resource_id;
+	}
+
+	public String getPair_common_id() {
+		return pair_common_id;
+	}
+
+	public void setPair_common_id(String pair_common_id) {
+		this.pair_common_id = pair_common_id;
 	}
 
 }

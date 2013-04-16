@@ -1439,7 +1439,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 		IPPApplicationResourceClient summary_client = new IPPApplicationResourceClient(this);
 		summary_client.setAuthKey(ipp_auth_key);
 		QueryCondition condition = new QueryCondition();
-		condition.setSelf();
+		condition.eq("user_name",ipp_id_string);
 		condition.build();
 		summary_client.query(SummaryItem.class, condition, new SummaryGetCallback());
 
@@ -1500,6 +1500,8 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			//チーム
 			summary_item.setTeam_resource_id(team_resource_id);
 			summary_item.setPair_common_id(pair_common_id);
+
+			summary_item.setUser_name(ipp_id_string);
 
 			//更新,というかあげなおす
 			summary_client.create(SummaryItem.class, summary_item, new SummaryUpdateCallback());
@@ -1579,6 +1581,10 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 		peb_item_inputted.setTimestamp(timestamp.getTime());
 
 
+		//ペアのid
+		peb_item_inputted.setPair_common_id(pair_common_id);
+
+
 		//IPPプラットフォーム登録
 		IPPApplicationResourceClient resource_client = new IPPApplicationResourceClient(this.getApplicationContext());
 		resource_client.setAuthKey(ipp_auth_key);
@@ -1651,6 +1657,9 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 		product_item_inputted.setProducer(((TextView) findViewById(R.id.product_selected_producer)).getText().toString());
 
 		product_item_inputted.setTimestamp(timestamp.getTime());
+
+		//ペアのid
+		product_item_inputted.setPair_common_id(pair_common_id);
 
 
 		//IPPプラットフォーム登録

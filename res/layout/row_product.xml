@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.newecosns.utnils.CheckableLinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.newecosns.utnils.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/bg_row_peb_text"
-	android:state_checkable="true"
-    >
+    android:orientation="vertical"
+    android:state_checkable="true" >
 
     <TextView
         android:id="@+id/nameProduct"
@@ -27,35 +25,49 @@
         android:padding="6dp"
         android:visibility="gone" >
 
-        <TextView
-            android:id="@+id/producerProduct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-
         <LinearLayout
+            android:id="@+id/producer_in_product"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:id="@+id/detail_in_product"
             android:orientation="horizontal" >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="@string/input_log_item_product_producer_label_before"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/producerProduct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/detail_in_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_log_item_product_mark_label_before"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/markProduct"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="3dp"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/input_log_item_product_mark_label_after"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
         </LinearLayout>

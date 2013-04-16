@@ -21,6 +21,9 @@ public class PEBItem extends IPPApplicationResource  {
 
 	private String author_name = null; //作者のuser_name
 
+	String team_resource_id = null;
+	String pair_resource_id = null;
+	String pair_common_id = null;
 
 
 	public String getName() {
@@ -100,6 +103,30 @@ public class PEBItem extends IPPApplicationResource  {
 	public String getResourceName() {
 
 		return "peb";
+	}
+
+	public String getTeam_resource_id() {
+		return team_resource_id;
+	}
+
+	public void setTeam_resource_id(String team_resource_id) {
+		this.team_resource_id = team_resource_id;
+	}
+
+	public String getPair_resource_id() {
+		return pair_resource_id;
+	}
+
+	public void setPair_resource_id(String pair_resource_id) {
+		this.pair_resource_id = pair_resource_id;
+	}
+
+	public String getPair_common_id() {
+		return pair_common_id;
+	}
+
+	public void setPair_common_id(String pair_common_id) {
+		this.pair_common_id = pair_common_id;
 	}
 
 
