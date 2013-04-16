@@ -970,7 +970,7 @@ containing a value of this type.
     }
     public static final class id {
         public static final int CommentCreatedInList=0x7f050076;
-        public static final int CommentParentIdNew=0x7f050060;
+        public static final int CommentParentIdNew=0x7f050064;
         public static final int CommentParentResourceIdInList=0x7f050077;
         public static final int CommentResourceIdInList=0x7f050078;
         public static final int CommentScreenNameInList=0x7f050072;
@@ -993,7 +993,7 @@ containing a value of this type.
         public static final int LogCo2WrapperInList=0x7f05007b;
         public static final int LogPriceWrapperInList=0x7f05007f;
         public static final int PEBList=0x7f050038;
-        public static final int ProgressBarInCommentList=0x7f05005e;
+        public static final int ProgressBarInCommentList=0x7f050062;
         public static final int ProgressBarInList=0x7f050085;
         public static final int ProgressBarInPEBList=0x7f050039;
         public static final int ScrollViewInputLog=0x7f05003a;
@@ -1050,12 +1050,12 @@ containing a value of this type.
         public static final int check_tweet=0x7f050050;
         public static final int co2PEB=0x7f05008e;
         public static final int co2_in_summary=0x7f05009d;
-        public static final int comment_list=0x7f05005d;
+        public static final int comment_list=0x7f050061;
         public static final int container=0x7f05005a;
         public static final int detail_in_peb=0x7f05008d;
         public static final int detail_in_product=0x7f050094;
         public static final int disableHome=0x7f050009;
-        public static final int editText=0x7f050061;
+        public static final int editText=0x7f050065;
         public static final int editTextId=0x7f050053;
         public static final int editTextPass=0x7f050054;
         public static final int edit_query=0x7f050027;
@@ -1082,13 +1082,13 @@ containing a value of this type.
         public static final int month_label_in_summary_fragment=0x7f05009a;
         public static final int namePEB=0x7f05008a;
         public static final int nameProduct=0x7f050091;
-        public static final int next_month=0x7f050066;
+        public static final int next_month=0x7f050060;
         public static final int normal=0x7f050001;
         public static final int number_in_summary=0x7f05009b;
         public static final int offline_log=0x7f05004f;
         public static final int pictureImageView=0x7f050052;
         public static final int pictureInList=0x7f050084;
-        public static final int previous_month=0x7f050064;
+        public static final int previous_month=0x7f05005e;
         public static final int price_in_summary=0x7f05009f;
         public static final int producerProduct=0x7f050093;
         public static final int product_peb_name=0x7f050041;
@@ -1100,7 +1100,7 @@ containing a value of this type.
         public static final int rank_in_summary=0x7f05009c;
         public static final int replies_list=0x7f05005b;
         public static final int replyBtn=0x7f050074;
-        public static final int reply_for=0x7f05005f;
+        public static final int reply_for=0x7f050063;
         public static final int screen_name_in_log_list=0x7f050089;
         public static final int screen_name_in_summary_fragment=0x7f050097;
         public static final int screen_name_label_in_summary_fragment=0x7f050098;
@@ -1111,7 +1111,7 @@ containing a value of this type.
         public static final int summary_list=0x7f05006c;
         public static final int summary_list_others=0x7f05006a;
         public static final int summary_list_wrapper=0x7f050069;
-        public static final int summary_month=0x7f050065;
+        public static final int summary_month=0x7f05005f;
         public static final int tabMode=0x7f050003;
         public static final int tableRow3=0x7f05003c;
         public static final int table_row_peb_name=0x7f05003f;
@@ -1123,8 +1123,8 @@ containing a value of this type.
         public static final int textPEB=0x7f05008c;
         public static final int text_in_comment_list=0x7f050079;
         public static final int text_of_action_dialog=0x7f050070;
-        public static final int top_control_bar=0x7f050063;
-        public static final int tweetBtn=0x7f050062;
+        public static final int top_control_bar=0x7f05005d;
+        public static final int tweetBtn=0x7f050066;
         public static final int useLogo=0x7f050004;
         public static final int waitBarInLogList=0x7f05006f;
         public static final int waitBarInSummaryList=0x7f05006b;

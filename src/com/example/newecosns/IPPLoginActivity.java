@@ -224,8 +224,8 @@ public class IPPLoginActivity extends Activity {
 			user_team_client.setAuthKey(authKey);
 			//ユーザ名を指定
 			QueryCondition condition = new QueryCondition();
-			//condition.eq("user_name",user_name.getText().toString());
-			condition.setSelf();
+			condition.eq("user_name",user_name.getText().toString());
+			//condition.setSelf();
 			condition.build();
 			user_team_client.query(UserTeamItem.class,condition, new UserTeamCallback());
 
@@ -480,6 +480,7 @@ public class IPPLoginActivity extends Activity {
 		IPPApplicationResourceClient client = new IPPApplicationResourceClient(this.getApplicationContext());
 		QueryCondition condition = new QueryCondition();
 		condition.eq("team_resource_id", team_resource_id);
+		condition.setCount(10);
 		condition.build();
 		client.setAuthKey(ipp_auth_key);
 		client.query(PairItem.class, condition, new PairItemCallback(this.getApplicationContext()));
@@ -510,8 +511,11 @@ public class IPPLoginActivity extends Activity {
 			Log.d(TAG, "チーム読み込み失敗");
 
 			//MainActivityに戻る
-		    Intent intent = new Intent(IPPLoginActivity.this, MainActivity.class);
-		    startActivity(intent);
+		    //Intent intent = new Intent(IPPLoginActivity.this, MainActivity.class);
+		    //startActivity(intent);
+			Intent localIntent = new Intent(IPPLoginActivity.this, MainActivity.class);
+		    IPPLoginActivity.this.setResult(100, localIntent);
+			finish();
 
 		}
 
@@ -540,7 +544,7 @@ public class IPPLoginActivity extends Activity {
 
 	          String str = IPPLoginActivity.makeJSONString(localArrayList);
 
-	          ipp_editor.putString("pair_item_list", str);
+	          ipp_editor.putString("pair_item_list_string", str);
 
 			ipp_editor.commit();
 

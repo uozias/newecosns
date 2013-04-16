@@ -4,6 +4,43 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+
+      <!-- 月選択メニュー -->
+
+    <LinearLayout
+        android:id="@+id/top_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/previous_month"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/button_left" />
+
+        <Button
+            android:id="@+id/summary_month"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/button_this_month"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/this_month"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/next_month"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/button_right" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

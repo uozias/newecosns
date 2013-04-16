@@ -18,7 +18,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import twitter4j.Status;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -27,11 +30,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -39,8 +44,10 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,17 +112,27 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	CheckBox tweetCheckBox = null;
 	ProgressBar waitBar =null;
 
-	//月選択・リスト表示関連
+
+
+	//今表示してる内容
+	int target_year = 0;
+	int target_month = 0;
 	long last_timestamp = 0;
     long until = 0L;
-    int target_month = 0;
-    int target_year = 0;
 
-    Button this_month = null;
-
+    ListView listView = null;
+    Calendar calendar = null;
+	//月変更用ボタン
+	Button this_month = null;
+	Button next_month = null;
+	Button previous_month = null;
 
 	EditText twTx = null;
 	CohesiveCommentAdapter adapter = null;
+
+
+	private AlertDialog dateDialog = null;
+	DatePicker datePicker = null;
 
 	//ロケーション関連
 		private LocationManager mLocationManager = null;
@@ -147,6 +164,10 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	public void onStart() {
 		super.onStart();
 
+		listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView
+		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
+
+		calendar = Calendar.getInstance();
 		//IPPログインチェック
 		ippLoginCheck();
 
@@ -175,7 +196,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		});
 		*/
 
-		//prepareChangeMonth();
+		prepareChangeMonth();
 
 		//アクションバー右上のメニュー切り替え
 		switch (MainActivity.mMenuType) {
@@ -189,7 +210,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		//IPPからコメント読み込む
 		//更に読みこむ機能の実装
-		showCommentList(0);
+		showCommentList(target_year, target_month, 0);
 	}
 
 
@@ -470,7 +491,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			geo_location_client.setAuthKey(ipp_auth_key);
 			geo_location_client.create(geo_location, new geoPostCallback());
 
-			showCommentList(0);
+			showCommentList(target_year, target_month, 0);
 
 		}
 
@@ -560,7 +581,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		//リロード
 		if (item.getItemId() == reload_menu_id) {
-			showCommentList(0);
+			showCommentList(target_year, target_month, 0);
 
 		}
 
@@ -574,7 +595,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			}catch (NullPointerException e){
 
 			}
-			showCommentList(until);
+			showCommentList(target_year, target_month, until);
 		}
 
 		//ストレス変更
@@ -595,9 +616,14 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //IPPからコメント読み込むメソッド
-	public void showCommentList(long until) {
+	public void showCommentList(int target_year, int target_month, long until) {
 		//オンラインなら外部DBから他人のデータ読み出し//
-		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
+		try{
+			waitBar.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+		}catch (NullPointerException e){
+			Log.d(TAG,e.toString());
+		}
 
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
 
@@ -659,7 +685,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				last_timestamp = comment_item.getTimestamp(); //最後の要素のタイムスタンプを得る
 			}
 
-			ListView listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView
+
 
 
 			adapter = new CohesiveCommentAdapter(getSherlockActivity().getApplicationContext(), CommentItemList, team_resource_id, role_self);
@@ -961,7 +987,122 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//表示する月の変更
+
+
+	private void prepareChangeMonth(){
+		this_month = (Button) getSherlockActivity().findViewById(R.id.summary_month);
+		previous_month = (Button) getSherlockActivity().findViewById(R.id.previous_month);
+		next_month = (Button) getSherlockActivity().findViewById(R.id.next_month);
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		if (currentapiVersion >= 11) {
+			makeDateOnlyPickerH();
+		}else{
+			makeDateOnlyPicker();
+		}
+
+
+
+		this_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dateDialog.show();
+
+			}
+		});
+
+		previous_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				calendar.add(Calendar.MONTH, -1);
+				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
+				target_year = calendar.get(Calendar.YEAR);
+				target_month = calendar.get(Calendar.MONTH);
+				showCommentList(target_year,target_month , 0);
+
+			}
+		});
+
+		next_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				calendar.add(Calendar.MONTH, 1);
+				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
+				target_year = calendar.get(Calendar.YEAR);
+				target_month = calendar.get(Calendar.MONTH);
+				showCommentList(target_year,target_month , 0);
+
+			}
+		});
+
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void makeDateOnlyPickerH(){
+
+		//月日選択ダイアログを作る
+		AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+		datePicker = new DatePicker(getSherlockActivity());
+
+		datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
+		int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
+
+		datePicker.findViewById(day_id).setVisibility(View.GONE);
+		datePicker.setCalendarViewShown(false);
+
+		dateDialog = builder.setView(datePicker)
+		       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
+		       .setPositiveButton(android.R.string.ok,
+		                          new DialogInterface.OnClickListener() {
+		                              @Override
+		                              public void onClick(DialogInterface d, int w) {
+		                            	  int month_id = Resources.getSystem().getIdentifier("month", "id", "android");
+		                            	  NumberPicker monthView = (NumberPicker) datePicker.findViewById(month_id);
+		                            	  int year_id = Resources.getSystem().getIdentifier("year", "id", "android");
+		                            	  NumberPicker yearView = (NumberPicker) datePicker.findViewById(year_id);
+		                            	  this_month.setText(String.valueOf(monthView.getValue()+1)+"月");
+		                            	  calendar.set(yearView.getValue(), monthView.getValue(), 1, 0, 0, 0);
+			                      			target_year = calendar.get(Calendar.YEAR);
+			                    			target_month = calendar.get(Calendar.MONTH);
+			                    			showCommentList(target_year,target_month , 0);
+
+		                              }
+		                          })
+		       .setNegativeButton(android.R.string.cancel, null)
+		       .create();
+	}
+
+	private void makeDateOnlyPicker(){
+
+		//月日選択ダイアログを作る
+		AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+		datePicker = new DatePicker(getSherlockActivity());
+
+		datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
+		int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
+		datePicker.findViewById(day_id).setVisibility(View.GONE);
+		dateDialog = builder.setView(datePicker)
+		       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
+		       .setPositiveButton(android.R.string.ok,
+		                          new DialogInterface.OnClickListener() {
+		                              @Override
+		                              public void onClick(DialogInterface d, int w) {
+		                            	  previous_month.setText(datePicker.getMonth());
+		                            	  calendar.set(datePicker.getYear(), datePicker.getMonth(), 1, 0, 0, 0);
+		                            		target_year = calendar.get(Calendar.YEAR);
+			                    			target_month = calendar.get(Calendar.MONTH);
+			                    			showCommentList(target_year,target_month , 0);
+
+		                              }
+		                          })
+		       .setNegativeButton(android.R.string.cancel, null)
+		       .create();
+	}
+
 
 
 }

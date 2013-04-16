@@ -127,6 +127,9 @@ public class OthersLogFragment extends SherlockFragment {
 	int target_month = 0;
 	long last_timestamp = 0;
 
+	private long since;
+	private long until;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -154,7 +157,6 @@ public class OthersLogFragment extends SherlockFragment {
 
 		//wait_bar = (ProgressBar) getSherlockActivity().findViewById(R.id.waitBarInLogList);
 		wait_bar_summary = (ProgressBar) getSherlockActivity().findViewById(R.id.waitBarInSummaryList);
-
 		calendar = Calendar.getInstance();
 
 		//PEBリスト準備
@@ -523,24 +525,25 @@ public class OthersLogFragment extends SherlockFragment {
 			month = calendar.get(Calendar.MONTH);
 			calendar.set(year, month, 1, 0, 0, 0);
 
-			condition.setSince(calendar.getTimeInMillis()); //今月頭から
-
-
-			condition.setUntil(System.currentTimeMillis()); //現在まで
+			since = calendar.getTimeInMillis(); //今月頭から
+			until = System.currentTimeMillis(); //現在まで
 
 
 
 		}else{//月と日を指定されたら
 			year = target_year;
 			calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
-			condition.setSince(calendar.getTimeInMillis());
-
+			since = calendar.getTimeInMillis();
 			calendar.add(Calendar.MONTH, 1);
-			condition.setUntil(calendar.getTimeInMillis()); //次の月の1日まで
-			 calendar.add(Calendar.MONTH, -1); //戻しとく
+			until = calendar.getTimeInMillis(); //次の月の1日まで
+			calendar.add(Calendar.MONTH, -1); //戻しとく
 
 
 		}
+
+		condition.setSince(since);
+		condition.setUntil(until);
+		condition.eq("pair_common_id",pair_common_id);
 
 		condition.build();
 		public_resource_client.query(SummaryItem.class,condition, new SummaryGetCallback());
@@ -639,117 +642,117 @@ public class OthersLogFragment extends SherlockFragment {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//表示する月の変更
 
-private void prepareChangeMonth(){
-	this_month = (Button) getSherlockActivity().findViewById(R.id.summary_month);
-	previous_month = (Button) getSherlockActivity().findViewById(R.id.previous_month);
-	next_month = (Button) getSherlockActivity().findViewById(R.id.next_month);
-	int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-	if (currentapiVersion >= 11) {
-		makeDateOnlyPickerH();
-	}else{
-		makeDateOnlyPicker();
+	private void prepareChangeMonth(){
+		this_month = (Button) getSherlockActivity().findViewById(R.id.summary_month);
+		previous_month = (Button) getSherlockActivity().findViewById(R.id.previous_month);
+		next_month = (Button) getSherlockActivity().findViewById(R.id.next_month);
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		if (currentapiVersion >= 11) {
+			makeDateOnlyPickerH();
+		}else{
+			makeDateOnlyPicker();
+		}
+
+
+
+		this_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dateDialog.show();
+
+			}
+		});
+
+		previous_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				calendar.add(Calendar.MONTH, -1);
+				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
+				target_year = calendar.get(Calendar.YEAR);
+				target_month = calendar.get(Calendar.MONTH);
+				showLogAndSummaryList(target_year,target_month , 0);
+
+			}
+		});
+
+		next_month.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				calendar.add(Calendar.MONTH, 1);
+				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
+				target_year = calendar.get(Calendar.YEAR);
+				target_month = calendar.get(Calendar.MONTH);
+				showLogAndSummaryList(target_year,target_month , 0);
+
+			}
+		});
+
 	}
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void makeDateOnlyPickerH(){
 
+		//月日選択ダイアログを作る
+		AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+		datePicker = new DatePicker(getSherlockActivity());
 
-	this_month.setOnClickListener(new OnClickListener() {
+		datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
+		int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
 
-		@Override
-		public void onClick(View v) {
-			dateDialog.show();
+		datePicker.findViewById(day_id).setVisibility(View.GONE);
+		datePicker.setCalendarViewShown(false);
 
-		}
-	});
+		dateDialog = builder.setView(datePicker)
+		       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
+		       .setPositiveButton(android.R.string.ok,
+		                          new DialogInterface.OnClickListener() {
+		                              @Override
+		                              public void onClick(DialogInterface d, int w) {
+		                            	  int month_id = Resources.getSystem().getIdentifier("month", "id", "android");
+		                            	  NumberPicker monthView = (NumberPicker) datePicker.findViewById(month_id);
+		                            	  int year_id = Resources.getSystem().getIdentifier("year", "id", "android");
+		                            	  NumberPicker yearView = (NumberPicker) datePicker.findViewById(year_id);
+		                            	  this_month.setText(String.valueOf(monthView.getValue()+1)+"月");
+		                            	  calendar.set(yearView.getValue(), monthView.getValue(), 1, 0, 0, 0);
+			                      			target_year = calendar.get(Calendar.YEAR);
+			                    			target_month = calendar.get(Calendar.MONTH);
+			                    			showLogAndSummaryList(target_year,target_month , 0);
 
-	previous_month.setOnClickListener(new OnClickListener() {
+		                              }
+		                          })
+		       .setNegativeButton(android.R.string.cancel, null)
+		       .create();
+	}
 
-		@Override
-		public void onClick(View view) {
-			calendar.add(Calendar.MONTH, -1);
-			this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
-			target_year = calendar.get(Calendar.YEAR);
-			target_month = calendar.get(Calendar.MONTH);
-			showLogAndSummaryList(target_year,target_month , 0);
+	private void makeDateOnlyPicker(){
 
-		}
-	});
+		//月日選択ダイアログを作る
+		AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+		datePicker = new DatePicker(getSherlockActivity());
 
-	next_month.setOnClickListener(new OnClickListener() {
+		datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
+		int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
+		datePicker.findViewById(day_id).setVisibility(View.GONE);
+		dateDialog = builder.setView(datePicker)
+		       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
+		       .setPositiveButton(android.R.string.ok,
+		                          new DialogInterface.OnClickListener() {
+		                              @Override
+		                              public void onClick(DialogInterface d, int w) {
+		                            	  previous_month.setText(datePicker.getMonth());
+		                            	  calendar.set(datePicker.getYear(), datePicker.getMonth(), 1, 0, 0, 0);
+		                            		target_year = calendar.get(Calendar.YEAR);
+			                    			target_month = calendar.get(Calendar.MONTH);
+			                    			showLogAndSummaryList(target_year,target_month , 0);
 
-		@Override
-		public void onClick(View view) {
-			calendar.add(Calendar.MONTH, 1);
-			this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
-			target_year = calendar.get(Calendar.YEAR);
-			target_month = calendar.get(Calendar.MONTH);
-			showLogAndSummaryList(target_year,target_month , 0);
-
-		}
-	});
-
-}
-
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-private void makeDateOnlyPickerH(){
-
-	//月日選択ダイアログを作る
-	AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
-	datePicker = new DatePicker(getSherlockActivity());
-
-	datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
-	int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
-
-	datePicker.findViewById(day_id).setVisibility(View.GONE);
-	datePicker.setCalendarViewShown(false);
-
-	dateDialog = builder.setView(datePicker)
-	       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
-	       .setPositiveButton(android.R.string.ok,
-	                          new DialogInterface.OnClickListener() {
-	                              @Override
-	                              public void onClick(DialogInterface d, int w) {
-	                            	  int month_id = Resources.getSystem().getIdentifier("month", "id", "android");
-	                            	  NumberPicker monthView = (NumberPicker) datePicker.findViewById(month_id);
-	                            	  int year_id = Resources.getSystem().getIdentifier("year", "id", "android");
-	                            	  NumberPicker yearView = (NumberPicker) datePicker.findViewById(year_id);
-	                            	  this_month.setText(String.valueOf(monthView.getValue()+1)+"月");
-	                            	  calendar.set(yearView.getValue(), monthView.getValue(), 1, 0, 0, 0);
-		                      			target_year = calendar.get(Calendar.YEAR);
-		                    			target_month = calendar.get(Calendar.MONTH);
-		                    			showLogAndSummaryList(target_year,target_month , 0);
-
-	                              }
-	                          })
-	       .setNegativeButton(android.R.string.cancel, null)
-	       .create();
-}
-
-private void makeDateOnlyPicker(){
-
-	//月日選択ダイアログを作る
-	AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
-	datePicker = new DatePicker(getSherlockActivity());
-
-	datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
-	int day_id = Resources.getSystem().getIdentifier("day", "id", "android");
-	datePicker.findViewById(day_id).setVisibility(View.GONE);
-	dateDialog = builder.setView(datePicker)
-	       .setTitle(getSherlockActivity().getApplicationContext().getString(R.string.select_month))
-	       .setPositiveButton(android.R.string.ok,
-	                          new DialogInterface.OnClickListener() {
-	                              @Override
-	                              public void onClick(DialogInterface d, int w) {
-	                            	  previous_month.setText(datePicker.getMonth());
-	                            	  calendar.set(datePicker.getYear(), datePicker.getMonth(), 1, 0, 0, 0);
-	                            		target_year = calendar.get(Calendar.YEAR);
-		                    			target_month = calendar.get(Calendar.MONTH);
-		                    			showLogAndSummaryList(target_year,target_month , 0);
-
-	                              }
-	                          })
-	       .setNegativeButton(android.R.string.cancel, null)
-	       .create();
-}
+		                              }
+		                          })
+		       .setNegativeButton(android.R.string.cancel, null)
+		       .create();
+	}
 
 	//ログイン用アクティビティから戻ってくるデータを保存
 	@Override

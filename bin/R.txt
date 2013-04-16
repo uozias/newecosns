@@ -285,7 +285,7 @@ int drawable this_month 0x7f020088
 int drawable tw_button_bg 0x7f020089
 int drawable type 0x7f02008a
 int id CommentCreatedInList 0x7f050076
-int id CommentParentIdNew 0x7f050060
+int id CommentParentIdNew 0x7f050064
 int id CommentParentResourceIdInList 0x7f050077
 int id CommentResourceIdInList 0x7f050078
 int id CommentScreenNameInList 0x7f050072
@@ -308,7 +308,7 @@ int id LogAmountWrapperInList 0x7f05007d
 int id LogCo2WrapperInList 0x7f05007b
 int id LogPriceWrapperInList 0x7f05007f
 int id PEBList 0x7f050038
-int id ProgressBarInCommentList 0x7f05005e
+int id ProgressBarInCommentList 0x7f050062
 int id ProgressBarInList 0x7f050085
 int id ProgressBarInPEBList 0x7f050039
 int id ScrollViewInputLog 0x7f05003a
@@ -365,12 +365,12 @@ int id button_outdoor 0x7f050037
 int id check_tweet 0x7f050050
 int id co2PEB 0x7f05008e
 int id co2_in_summary 0x7f05009d
-int id comment_list 0x7f05005d
+int id comment_list 0x7f050061
 int id container 0x7f05005a
 int id detail_in_peb 0x7f05008d
 int id detail_in_product 0x7f050094
 int id disableHome 0x7f050009
-int id editText 0x7f050061
+int id editText 0x7f050065
 int id editTextId 0x7f050053
 int id editTextPass 0x7f050054
 int id edit_query 0x7f050027
@@ -397,13 +397,13 @@ int id month_in_summary_fragment 0x7f050099
 int id month_label_in_summary_fragment 0x7f05009a
 int id namePEB 0x7f05008a
 int id nameProduct 0x7f050091
-int id next_month 0x7f050066
+int id next_month 0x7f050060
 int id normal 0x7f050001
 int id number_in_summary 0x7f05009b
 int id offline_log 0x7f05004f
 int id pictureImageView 0x7f050052
 int id pictureInList 0x7f050084
-int id previous_month 0x7f050064
+int id previous_month 0x7f05005e
 int id price_in_summary 0x7f05009f
 int id producerProduct 0x7f050093
 int id product_peb_name 0x7f050041
@@ -415,7 +415,7 @@ int id radiogroup 0x7f050034
 int id rank_in_summary 0x7f05009c
 int id replies_list 0x7f05005b
 int id replyBtn 0x7f050074
-int id reply_for 0x7f05005f
+int id reply_for 0x7f050063
 int id screen_name_in_log_list 0x7f050089
 int id screen_name_in_summary_fragment 0x7f050097
 int id screen_name_label_in_summary_fragment 0x7f050098
@@ -426,7 +426,7 @@ int id showTitle 0x7f050007
 int id summary_list 0x7f05006c
 int id summary_list_others 0x7f05006a
 int id summary_list_wrapper 0x7f050069
-int id summary_month 0x7f050065
+int id summary_month 0x7f05005f
 int id tabMode 0x7f050003
 int id tableRow3 0x7f05003c
 int id table_row_peb_name 0x7f05003f
@@ -438,8 +438,8 @@ int id takePicBtn 0x7f050051
 int id textPEB 0x7f05008c
 int id text_in_comment_list 0x7f050079
 int id text_of_action_dialog 0x7f050070
-int id top_control_bar 0x7f050063
-int id tweetBtn 0x7f050062
+int id top_control_bar 0x7f05005d
+int id tweetBtn 0x7f050066
 int id useLogo 0x7f050004
 int id waitBarInLogList 0x7f05006f
 int id waitBarInSummaryList 0x7f05006b
