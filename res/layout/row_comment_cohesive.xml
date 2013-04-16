@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:text="@string/reply_to_comment"
             android:textSize="14sp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/showConversation"

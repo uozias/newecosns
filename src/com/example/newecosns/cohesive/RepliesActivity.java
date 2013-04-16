@@ -33,6 +33,9 @@ public class RepliesActivity extends Activity {
 	//ストレス状態
 	public String stress_now ;
 
+	private String team_resource_id;
+	private int role_self  = 0;
+
 	//閉じるボタン
 	Button closeBtn = null;
 
@@ -72,6 +75,9 @@ public class RepliesActivity extends Activity {
 			ipp_id_string = ipp_pref.getString("ipp_id_string", "");
 			ipp_pass_string = ipp_pref.getString("ipp_pass","");
 			ipp_screen_name  = ipp_pref.getString("ipp_screen_name", "");
+
+			team_resource_id = ipp_pref.getString("team_resource_id", "");
+			role_self = ipp_pref.getInt("role_self", 0);
 
 			//auth_keyがなければ
 			if(ipp_auth_key.equals("")){
@@ -202,15 +208,43 @@ public class RepliesActivity extends Activity {
 
 
 		//密な時は自分と他人を分ける
-			if(item.getRole().equals(Constants.SENPAI)){
+			//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
+			if(team_resource_id != null && role_self != 0){
+				//自分側チームの時
+				if(item.getTeam_resource_id().equals(team_resource_id)){
+					switch(role_self){
+						case Constants.KOHAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+							break;
+						case Constants.SENPAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+							break;
+						case Constants.RELAXED_ROLE:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+							break;
 
+					}
+				//相手側チーム(というか自分のチーム以外)のとき
+				}else{
+					switch(role_self){
+					case Constants.KOHAI:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+						break;
+					case Constants.SENPAI:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+						break;
+					case Constants.RELAXED_ROLE:
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+						break;
+
+					}
+
+				}
+			}else{
 				convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
 
-
-			}else if(item.getRole().equals(Constants.KOHAI)){
-
-				convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
 			}
+
 
 
 			//ビューに値をセット

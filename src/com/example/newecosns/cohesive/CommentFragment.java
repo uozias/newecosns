@@ -887,6 +887,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 			//返信ボタンをタップしたら
 			replyBtn = (Button) convertView.findViewById(R.id.replyBtn);
+
 			replyBtn.setOnClickListener(new setReplyTarget(item));
 
 			return convertView;
