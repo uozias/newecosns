@@ -512,7 +512,7 @@ public class OthersLogFragment extends SherlockFragment {
 		QueryCondition condition = new QueryCondition();
 		condition.setCount(10);
 
-
+		//adapter.clear()
 
 
 		//読みだすデータの日時の範囲を指定

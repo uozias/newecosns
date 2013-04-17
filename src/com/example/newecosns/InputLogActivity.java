@@ -66,9 +66,11 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -1036,6 +1038,8 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			 /*
 	         * クリック処理(家計簿入力)
 	         */
+
+
 	        inputFixBtn = (Button)this.findViewById(R.id.inputFixBtn);
 	        inputFixBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -1051,7 +1055,13 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		private void startSavingFlow(){
+
+
 			if(peb_item_selected != null){
+
+				((ProgressBar) findViewById(R.id.sender_indicator)).setVisibility(View.VISIBLE); //プログレスバーをだす
+				((ScrollView) findViewById(R.id.ScrollViewInputLog)).setVisibility(View.GONE);
+
 				if(product_item_selected != null && selected_place_tag.equals("purchase")){
 					if(product_item_selected.getId() == NEW_ITEM_FLG){
 						//製品新規登録フロー
@@ -1077,6 +1087,8 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 							*/
 						}
 					}
+
+
 
 				}else if(selected_place_tag.equals("indoor") || selected_place_tag.equals("outdoor")){
 					if( peb_item_selected.getId() == NEW_ITEM_FLG ){
@@ -1363,9 +1375,12 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			//メインアクティビティ(家計簿まとめ画面)に戻る
 			sdb.close();
 
+	
 
 			Intent intent = new Intent(InputLogActivity.this, MainActivity.class);
 			startActivity(intent);
+			//setResult(200);
+			//finish(); //debug
 			overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
 
 			updateSummary(); //サマリーの更新
@@ -1744,7 +1759,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 		if(REQUEST_CAPTURE_IMAGE == requestCode
 			&& resultCode == Activity.RESULT_OK ){
 
-			//TODO 関数化
+			// 関数化
 			int orientation  = 0;
 			if(data == null){
 				FileInputStream fis = null;
@@ -1763,7 +1778,13 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 						Log.d(TAG,e.toString());
 					}
 
-					capturedImage = BitmapFactory.decodeStream( fis );
+					try {
+						capturedImage = getBitmapFromUri(Uri.fromFile(capturedFile));
+					} catch (IOException e) {
+						// TODO 自動生成された catch ブロック
+						Log.d(TAG,e.toString());
+					}
+					//capturedImage = BitmapFactory.decodeStream( fis );
 
 				}
 
@@ -1892,10 +1913,8 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 	    BitmapFactory.decodeStream(iStream, null, options);
 
 		//読み込むスケールを計算する
-		int scaleW = options.outWidth / 320+1;
-		int scaleH = options.outHeight / 240+1;
-		options.inSampleSize = Math.max(scaleW, scaleH);
 
+		options.inSampleSize = calculateInSampleSize(options, 320, 240 );
 		//計算したスケールで画像を読み込む
 		options.inJustDecodeBounds = false;
 		iStream = conReslv.openInputStream(imageUri);
@@ -1903,6 +1922,23 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 
 
         return bmp;
+	}
+
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+
+	    // 画像の元サイズ
+	    final int height = options.outHeight;
+	    final int width = options.outWidth;
+	    int inSampleSize = 1;
+
+	    if (height > reqHeight || width > reqWidth) {
+	        if (width > height) {
+	            inSampleSize = Math.round((float)height / (float)reqHeight);
+	        } else {
+	            inSampleSize = Math.round((float)width / (float)reqWidth);
+	        }
+	    }
+	    return inSampleSize;
 	}
 
 	//写真送信

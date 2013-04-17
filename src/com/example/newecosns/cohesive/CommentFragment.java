@@ -635,7 +635,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		}
 
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
-
+			adapter.clear();
 
 			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
 			public_resource_client.setAuthKey(ipp_auth_key);
@@ -669,7 +669,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 			}else{//月と日を指定されたら
-				adapter.clear();
+
 				year = target_year;
 				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
 				since = calendar.getTimeInMillis();
@@ -722,7 +722,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				Collections.sort(CommentItemList, new PublicResourceComparatorInverse());
 
 				if(until == 0){ //初期よみこみ
-					adapter.addAll(CommentItemList);
+					for(CommentItem commentItem : CommentItemList){
+
+						adapter.add(commentItem);
+					}
+
 
 
 
@@ -740,7 +744,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				}else{ //追加読み込み
 
 
-					adapter.addAll(CommentItemList);
+					for(CommentItem commentItem : CommentItemList){
+
+						adapter.add(commentItem);
+					}
+
 
 				}
 

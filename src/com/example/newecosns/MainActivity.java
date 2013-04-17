@@ -235,7 +235,8 @@ public class MainActivity extends SherlockFragmentActivity {
 							.setText(R.string.tab_comment_cohesive)
 							.setIcon(android.R.drawable.ic_menu_crop)
 							.setTabListener(new TabListener<CommentFragment>(
-									MainActivity.this, "commentFragment", CommentFragment.class)));
+									MainActivity.this, "commentFragment", CommentFragment.class))
+							);
 					actionBar.addTab(actionBar.newTab()
 							.setText(R.string.tab_others_cohesive)
 							.setIcon(android.R.drawable.ic_menu_edit)
@@ -247,22 +248,26 @@ public class MainActivity extends SherlockFragmentActivity {
 							.setTabListener(new TabListener<SummaryFragment>(
 									MainActivity.this, "summaryFragment", SummaryFragment.class))
 							);
-				}else if(stress_now.equals(StressItem.RELAXED)){
 
+				}else if(stress_now.equals(StressItem.RELAXED)){
 					actionBar.addTab(actionBar.newTab()
 							.setText(R.string.tab_mixed_relaxed)
 							.setIcon(android.R.drawable.ic_menu_crop)
 							.setTabListener(new TabListener<MixedTimelineFragment>(
-									MainActivity.this, "mixedTimelineFragment", MixedTimelineFragment.class)));
+									MainActivity.this, "mixedTimelineFragment", MixedTimelineFragment.class))
+							);
 					actionBar.addTab(actionBar.newTab()
 							.setText(R.string.tab_summary_relaxed)
 							.setIcon(android.R.drawable.ic_menu_edit)
 							.setTabListener(new TabListener<SummaryFragment>(
 									MainActivity.this, "summaryFragment", SummaryFragment.class))
 							);
+
+
 				}
+
 				//右はじのタブ(個人家計簿)表示
-				actionBar.getTabAt(1).select();
+				//actionBar.getTabAt(1).select();
 
 			}
 		});

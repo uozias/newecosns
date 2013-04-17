@@ -98,14 +98,14 @@ public class TabListener<T extends SherlockFragment> implements ActionBar.TabLis
 
 			mFragment.setArguments(bundle);
 
-			//fm.beginTransaction().add(R.id.container, mFragment, mTag).commit(); //おそらくcontainer内に指定されたフラグメントを表示している
-			fm.beginTransaction().add(R.id.container, mFragment, mTag).commitAllowingStateLoss();
+			fm.beginTransaction().add(R.id.container, mFragment, mTag).commit(); //おそらくcontainer内に指定されたフラグメントを表示している
+			//fm.beginTransaction().add(R.id.container, mFragment, mTag).commitAllowingStateLoss();
 
 		} else {
 			if (mFragment.isDetached()) {
 				FragmentManager fm = mActivity.getSupportFragmentManager();
-				//fm.beginTransaction().attach(mFragment).commit();
-				fm.beginTransaction().attach(mFragment).commitAllowingStateLoss();
+				fm.beginTransaction().attach(mFragment).commit();
+				//fm.beginTransaction().attach(mFragment).commitAllowingStateLoss();
 
 			}
 		}
@@ -114,6 +114,7 @@ public class TabListener<T extends SherlockFragment> implements ActionBar.TabLis
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 
+
 	}
 
 	@Override
@@ -121,8 +122,8 @@ public class TabListener<T extends SherlockFragment> implements ActionBar.TabLis
 		//フラグメントをUIから取り外す
 		if (mFragment != null) {
 			FragmentManager fm = mActivity.getSupportFragmentManager();
-			//fm.beginTransaction().detach(mFragment).commit();
-			fm.beginTransaction().detach(mFragment).commitAllowingStateLoss();
+			fm.beginTransaction().detach(mFragment).commit();
+			//fm.beginTransaction().detach(mFragment).commitAllowingStateLoss();
 		}
 	}
 

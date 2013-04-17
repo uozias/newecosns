@@ -189,57 +189,54 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		//使いまわす変数の初期化
-		initListUI();
-
-
-
-		//IPPログインチェック
-		ippLoginCheck();
-
-
-
-	     //位置情報が利用できるか否かをチェック
-		prepareLocation();
-
-		//ツイートする チェックボックスをタップしたら
-		 //prapereTweetCheck();
-
-
-		//コメント投稿ボタンを押したら
-		prapareCommentSend();
-
-		prepareChangeMonth();
-
-		//アクションバー右上のメニュー切り替え
-		switch (MainActivity.mMenuType) {
-		case MainActivity.SummaryFragmentMenu:
-			MainActivity.mMenuType = MainActivity.CommentFragmentMenu;
-			break;
-		default:
-			break;
-		}
 		this.getSherlockActivity().supportInvalidateOptionsMenu();
+		if( getSherlockActivity().getSupportActionBar().getSelectedTab().getPosition() == 0){
+			//使いまわす変数の初期化
+			initListUI();
 
 
-		((TextView) getSherlockActivity().findViewById(R.id.label_kouhai)).setVisibility(View.GONE);
-		((TextView) getSherlockActivity().findViewById(R.id.label_senpai)).setVisibility(View.GONE);
 
-		showMixedList(target_year, target_month, 0);
+			//IPPログインチェック
+			ippLoginCheck();
+
+
+
+		     //位置情報が利用できるか否かをチェック
+			prepareLocation();
+
+			//ツイートする チェックボックスをタップしたら
+			 //prapereTweetCheck();
+
+
+			//コメント投稿ボタンを押したら
+			prapareCommentSend();
+
+			prepareChangeMonth();
+
+			//アクションバー右上のメニュー切り替え
+			switch (MainActivity.mMenuType) {
+			case MainActivity.SummaryFragmentMenu:
+				MainActivity.mMenuType = MainActivity.CommentFragmentMenu;
+				break;
+			default:
+				break;
+			}
+
+
+
+			((TextView) getSherlockActivity().findViewById(R.id.label_kouhai)).setVisibility(View.GONE);
+			((TextView) getSherlockActivity().findViewById(R.id.label_senpai)).setVisibility(View.GONE);
+
+			showMixedList(target_year, target_month, 0);
+
+		}
+
 
 
 
 	}
 
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState){
-		super.onActivityCreated(savedInstanceState);
-
-
-
-	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -719,7 +716,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
-
+			adapter.clear(); //リスト初期化
 
 
 			//コメントの方
@@ -756,7 +753,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 				year = target_year;
 				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
 				since = calendar.getTimeInMillis();
-				adapter.clear(); //リスト初期化
+
 
 				if(until == 0){
 					calendar.add(Calendar.MONTH, 1);
@@ -821,7 +818,10 @@ class geoPostCallback implements IPPQueryCallback<String> {
 			IPPPublicResourceListTmp = new ArrayList<IPPApplicationResource>();
 			if(comment_item_array.length != 0){
 
-				IPPPublicResourceListTmp.addAll(Arrays.asList(comment_item_array));
+				for(CommentItem item: Arrays.asList(comment_item_array)){
+					IPPPublicResourceListTmp.add(item);
+				}
+
 
 				last_timestamp_holder_comment = comment_item_array[comment_item_array.length -1];
 				last_timestamp = last_timestamp_holder_comment.getTimestamp() -1; //最後の要素のタイムスタンプを得る(1秒過去にしておく)
@@ -855,7 +855,11 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		public void ippDidFinishLoading(LogItem[] log_item_array) {
 
 			if(log_item_array.length != 0){
-				IPPPublicResourceListTmp.addAll(Arrays.asList(log_item_array));
+				for(LogItem item : Arrays.asList(log_item_array)){
+					IPPPublicResourceListTmp.add(item);
+				}
+
+
 				if(last_timestamp > log_item_array[log_item_array.length -1].getTimestamp()){
 					last_timestamp = log_item_array[log_item_array.length -1].getTimestamp() -1;
 				}
@@ -864,7 +868,10 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 
 			Collections.sort(IPPPublicResourceListTmp, new PublicResourceComparator());
-			adapter.addAll(IPPPublicResourceListTmp);
+			for(IPPApplicationResource resource: IPPPublicResourceListTmp){
+				adapter.add(resource);
+			}
+
 
 
 			//インジゲータ操作

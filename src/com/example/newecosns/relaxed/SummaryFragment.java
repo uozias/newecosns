@@ -109,6 +109,9 @@ public class SummaryFragment extends SherlockFragment  {
 	int target_month = 0;
 	long last_timestamp = 0;
 
+	//家計簿入力への遷移
+	public final static  int  REQUEST_INPUT_LOG = 4;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -121,8 +124,8 @@ public class SummaryFragment extends SherlockFragment  {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-
-        return inflater.inflate(R.layout.fragment_summary, container, false);
+		View  view = inflater.inflate(R.layout.fragment_summary, container, false);
+        return  view;
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,6 +133,9 @@ public class SummaryFragment extends SherlockFragment  {
 	@Override
 	public void onStart(){
 		super.onStart();
+		this.getSherlockActivity().supportInvalidateOptionsMenu();
+
+
 
 
 
@@ -165,17 +171,25 @@ public class SummaryFragment extends SherlockFragment  {
 
 
 
-        this.getSherlockActivity().supportInvalidateOptionsMenu();
+
+
+	}
+
+	@Override
+	public void onStop(){
+		super.onStop();
+
+	}
+
+	@Override
+	public void onDestroyView(){
+		super.onDestroyView();
+		int i = 1; //debug
 
 	}
 
 
-	//アクションバー右上のメニュー切り替え
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-	        super.onActivityCreated(savedInstanceState);
 
-	    }
 
 
 
@@ -231,6 +245,7 @@ public class SummaryFragment extends SherlockFragment  {
 
 					//家計簿入力画面へ遷移
 					Intent intent = new Intent(getActivity(), InputLogActivity.class);
+					//startActivityForResult(intent, REQUEST_INPUT_LOG);
 					startActivity(intent);
 					getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 				}
@@ -501,13 +516,18 @@ public class SummaryFragment extends SherlockFragment  {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		//家計簿入力画面から帰ってきたら
+
+
 		//登録済み家計簿リスティング
 
 		if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
 		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
-		  }else{
-			  showLogAndSummaryList(0,0);
 		  }
+
+
+
+
+
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
