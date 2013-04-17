@@ -25,6 +25,7 @@
 
         <activity
             android:name="com.example.newecosns.MainActivity"
+            android:launchMode="singleTask"
             android:label="@string/app_name"
 
             android:screenOrientation="portrait" >

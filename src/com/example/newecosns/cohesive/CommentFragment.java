@@ -582,7 +582,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		//IPPログイン
 		if(item.getItemId() == ipp_login_menu_id){
 			Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
+		    startActivityForResult(intent, MainActivity.REQUEST_IPP_LOGIN);
 		    //スクリーンネーム消す
         	//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
     		//result.setText("");

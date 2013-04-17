@@ -222,6 +222,10 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 		}
 		this.getSherlockActivity().supportInvalidateOptionsMenu();
 
+
+		((TextView) getSherlockActivity().findViewById(R.id.label_kouhai)).setVisibility(View.GONE);
+		((TextView) getSherlockActivity().findViewById(R.id.label_senpai)).setVisibility(View.GONE);
+
 		showMixedList(target_year, target_month, 0);
 
 
@@ -642,7 +646,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		//IPPログイン
 		if(item.getItemId() == ipp_login_menu_id){
 			Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-		    startActivity(intent);
+		    startActivityForResult(intent, MainActivity.REQUEST_IPP_LOGIN);
 		    //スクリーンネーム消す
         	//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
     		//result.setText("");

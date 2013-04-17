@@ -217,17 +217,7 @@ public class SummaryFragment extends SherlockFragment  {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		//家計簿入力画面から帰ってきたら
-		//登録済み家計簿リスティング
 
-		if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
-		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
-		  }else{
-			  showLogAndSummaryList(0,0);
-		  }
-	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 登録ボタンクリック処理(家計簿入力画面へ)
@@ -497,7 +487,7 @@ public class SummaryFragment extends SherlockFragment  {
 		//IPPログイン
 		if(item.getItemId() == ipp_login_menu_id){
 			Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, MainActivity.REQUEST_IPP_LOGIN);
 			//スクリーンネーム消す
 			//TextView result = (TextView) getSherlockActivity().findViewById(R.id.screen_name); //debug
 			//result.setText("");
@@ -506,6 +496,18 @@ public class SummaryFragment extends SherlockFragment  {
 
 
 		return false;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		//家計簿入力画面から帰ってきたら
+		//登録済み家計簿リスティング
+
+		if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }else{
+			  showLogAndSummaryList(0,0);
+		  }
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -620,7 +620,7 @@ public class OthersLogFragment extends SherlockFragment {
 		//IPPログイン
 		if (item.getItemId() == ipp_login_menu_id) {
 			Intent intent = new Intent(getSherlockActivity(), IPPLoginActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, MainActivity.REQUEST_IPP_LOGIN);
 		}
 		//リロード
 		if (item.getItemId() == reload_menu_id) { //自分の家計簿のみ/他人の家計簿もをきりかえ

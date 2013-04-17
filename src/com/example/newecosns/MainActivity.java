@@ -93,9 +93,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 		*/
 
-		//ログインチェク
-		loginCheck();
-
 
 
 	}
@@ -106,6 +103,17 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onPostCreate(savedInstanceState);
 
 
+
+
+	}
+
+	@Override
+	public void onResume(){
+		super.onResume();
+
+
+		//ログインチェク
+		loginCheck();
 
 
 	}
