@@ -105,5 +105,6 @@
 	<string name="name_model_log">エコ報告</string>
 	<string name="name_role_senpai">先輩</string>
 	<string name="name_role_kouhai">後輩</string>
+	<string name="label_mutter_mixed">つぶやく</string>
 
 </resources>

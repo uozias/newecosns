@@ -20,8 +20,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/name_role_senpai"
-            android:background="@drawable/bg_label_senpai"
+            android:text="@string/name_role_kouhai"
+            android:background="@drawable/bg_label_kouhai"
             android:layout_margin="4dp"
             android:layout_alignParentLeft="true"
              android:textSize="22sp" />
@@ -59,8 +59,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_margin="4dp"
-            android:background="@drawable/bg_label_kouhai"
-            android:text="@string/name_role_kouhai"
+            android:background="@drawable/bg_label_senpai"
+            android:text="@string/name_role_senpai"
              android:textSize="22sp" />
 
     </RelativeLayout>

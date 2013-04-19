@@ -163,7 +163,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	CommentItem last_timestamp_holder_comment = null;
 	LogItem last_timestamp_holder_log = null;
 
-
+	Resources res = null;
 
 	//入力チェック
 	private boolean user_inputted = false;
@@ -194,7 +194,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 			//使いまわす変数の初期化
 			initListUI();
 
-
+			res = getResources();
 
 			//IPPログインチェック
 			ippLoginCheck();
@@ -346,7 +346,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 				@Override
 				public void onFocusChange(View v, boolean hasFocus) {
-					Resources res = getResources();
+
 					if(((TextView) v).getText().toString().equals(res.getText(R.string.instruction_input_comment))){
 						((TextView) v).setText("");
 						user_inputted = true;
@@ -358,6 +358,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 
 			twBtn = (Button) getSherlockActivity().findViewById(R.id.tweetBtn);
+			twBtn.setText(res.getText(R.string.label_mutter_mixed));
 			twBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

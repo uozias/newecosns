@@ -2,32 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/CommentScreenNameInList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/black"
-        android:textSize="14sp" >
-    </TextView>
-
-    <TextView
-        android:id="@+id/CommentTextInList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/black"
-        android:textSize="14sp" >
-    </TextView>
-
     <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/wrapper_comment_content"
+    android:orientation="vertical" >
+	    <TextView
+	        android:id="@+id/CommentScreenNameInList"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="left"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="5dp"
+	        android:textColor="@color/black"
+	        android:textSize="14sp" >
+	    </TextView>
+
+	    <TextView
+	        android:id="@+id/CommentTextInList"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="left"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="5dp"
+	        android:textColor="@color/black"
+	        android:textSize="14sp" >
+	    </TextView>
+
+
+
+	    <TextView
+	        android:id="@+id/CommentCreatedInList"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="left"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="5dp"
+	        android:textColor="@color/black"
+	        android:textSize="14sp" >
+	    </TextView>
+
+	</LinearLayout>
+
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="right"
@@ -38,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reply_to_comment"
-            android:textSize="14sp"
+            android:textSize="32sp"
             android:visibility="visible" />
 
         <Button
@@ -46,20 +65,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/showConversation"
-            android:textSize="14sp"
+            android:textSize="32sp"
             android:visibility="gone" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/CommentCreatedInList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/black"
-        android:textSize="14sp" >
-    </TextView>
 
     <!-- 隠し要素 -->
 
