@@ -50,6 +50,10 @@ public class CommentItem extends IPPApplicationResource {
 	String pair_resource_id = null;
 	String pair_common_id = null;
 
+	//スタ-
+	int star = 0;
+
+
 	public String getCommentUserName() {
 		return CommentUserName;
 	}
@@ -204,6 +208,12 @@ public class CommentItem extends IPPApplicationResource {
 	}
 	public void setPair_resource_id(String pair_resource_id) {
 		this.pair_resource_id = pair_resource_id;
+	}
+	public int getStar() {
+		return star;
+	}
+	public void setStar(int star) {
+		this.star = star;
 	}
 
 	//この他に、IPPPublicResourceが持っているTimestampとResourceIDがある

@@ -19,11 +19,11 @@
     <!-- CO2 -->
 
     <LinearLayout
+        android:id="@+id/LogCo2WrapperInList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:id="@+id/LogCo2WrapperInList"
         android:orientation="horizontal" >
 
         <TextView
@@ -85,10 +85,9 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-     <!-- かけた金額 -->
+    <!-- かけた金額 -->
 
-
-         <LinearLayout
+    <LinearLayout
         android:id="@+id/LogPriceWrapperInList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,7 +119,8 @@
             android:textSize="14sp" />
     </LinearLayout>
 
- 	<!-- カテゴリ -->
+    <!-- カテゴリ -->
+
     <TextView
         android:id="@+id/InputLogCategoryInList"
         android:layout_width="fill_parent"
@@ -132,6 +132,7 @@
     </TextView>
 
     <!-- 場所 -->
+
     <TextView
         android:id="@+id/InputLogPlaceInList"
         android:layout_width="match_parent"
@@ -139,10 +140,11 @@
         android:gravity="left"
         android:textColor="@color/black"
         android:textSize="18sp"
-        android:visibility="gone">
+        android:visibility="gone" >
     </TextView>
 
-      <!-- 日時 -->
+    <!-- 日時 -->
+
     <TextView
         android:id="@+id/InputLogCreatedInList"
         android:layout_width="match_parent"
@@ -167,6 +169,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal" />
+
 
     <!-- 以下隠し要素 -->
 

@@ -5,48 +5,83 @@
     android:orientation="vertical" >
 
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/wrapper_comment_content"
-    android:orientation="vertical" >
-	    <TextView
-	        android:id="@+id/CommentScreenNameInList"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:gravity="left"
-	        android:paddingLeft="5dp"
-	        android:paddingTop="5dp"
-	        android:textColor="@color/black"
-	        android:textSize="14sp" >
-	    </TextView>
+        android:id="@+id/wrapper_comment_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-	    <TextView
-	        android:id="@+id/CommentTextInList"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:gravity="left"
-	        android:paddingLeft="5dp"
-	        android:paddingTop="5dp"
-	        android:textColor="@color/black"
-	        android:textSize="14sp" >
-	    </TextView>
+        <TextView
+            android:id="@+id/CommentScreenNameInList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
 
+        <TextView
+            android:id="@+id/CommentTextInList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
 
-
-	    <TextView
-	        android:id="@+id/CommentCreatedInList"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:gravity="left"
-	        android:paddingLeft="5dp"
-	        android:paddingTop="5dp"
-	        android:textColor="@color/black"
-	        android:textSize="14sp" >
-	    </TextView>
-
-	</LinearLayout>
+        <TextView
+            android:id="@+id/CommentCreatedInList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"
+                android:src="@android:drawable/star_on" />
+
+            <TextView
+                android:id="@+id/label_of_number_of_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:text="@string/label_of_number_of_star"
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/number_of_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="right"
@@ -57,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reply_to_comment"
-            android:textSize="32sp"
+            android:textSize="28sp"
             android:visibility="visible" />
 
         <Button
@@ -65,9 +100,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/showConversation"
-            android:textSize="32sp"
+            android:textSize="28sp"
             android:visibility="gone" />
     </LinearLayout>
+
+ 	     <Button
+	         android:id="@+id/buton_evaluate_it"
+	         style="?android:attr/buttonStyleSmall"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:text="@string/buton_evaluate_it"
+	         android:layout_gravity="right"
+	         android:textSize="28sp"
+	          android:drawableLeft="@android:drawable/star_big_on"
+	        />
+
 
     <!-- 隠し要素 -->
 

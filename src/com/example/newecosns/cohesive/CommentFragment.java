@@ -68,6 +68,7 @@ import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.PublicResourceComparatorInverse;
+import com.example.newecosns.utnils.StarCallback;
 import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
@@ -175,7 +176,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		calendar = Calendar.getInstance();
 
-		adapter = new CohesiveCommentAdapter(getSherlockActivity().getApplicationContext(), new ArrayList<CommentItem>(), team_resource_id, role_self);
+		adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
 
 		//IPPログインチェック
 		ippLoginCheck();
@@ -375,6 +376,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 					//IPPへコメント投稿
 					CommentItem commentItem = new CommentItem();
+
+					//スター
+					commentItem.setStar(0);
+
+					//コメント内容
 					commentItem.setCommentText(tweetContent);
 
 					//現在の日時
@@ -780,8 +786,12 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		private Button replyBtn = null;
 		private Button showConversationBtn  = null;
 
+
 		private String team_resource_id = null;
 		private int role_self = 0;
+
+		private TextView number_of_star = null;
+		private Button buton_evaluate_it = null;
 
 		public CohesiveCommentAdapter(Context context, List<CommentItem> comments) {
 			super(context, 0, comments);
@@ -810,6 +820,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			if(convertView == null){
 				convertView = mInflater.inflate(R.layout.row_comment_cohesive, null);
 			}
+
+
 
 
 			//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
@@ -897,6 +909,20 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			replyBtn = (Button) convertView.findViewById(R.id.replyBtn);
 
 			replyBtn.setOnClickListener(new setReplyTarget(item));
+
+
+
+
+			//評価ボタン押す //スター
+			buton_evaluate_it = (Button) convertView.findViewById(R.id.buton_evaluate_it);
+			number_of_star = (TextView) convertView.findViewById(R.id.number_of_star);
+			buton_evaluate_it.setOnClickListener(new StarCallback(item, ipp_auth_key, context, number_of_star));
+
+			if(item.getStar() != 0){
+				number_of_star.setText(String.valueOf(item.getStar()));
+			}
+
+
 
 			return convertView;
 		}

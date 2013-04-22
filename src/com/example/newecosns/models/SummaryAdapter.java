@@ -9,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.newecosns.R;
 import com.example.newecosns.utnils.Constants;
+import com.example.newecosns.utnils.StarCallback;
 
 public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 	private LayoutInflater mInflater;
@@ -21,20 +24,30 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 	private String team_resource_id = null;
 	private int role_self = 0;
 
+	private String ipp_auth_key;
+
+	private TextView number_of_star = null;
+	private Button buton_evaluate_it = null;
+
+	private int flg_self_only = 0;
+
 	public SummaryAdapter(Context context, List<SummaryItem> objects) {
 		super(context, 0,  objects);
 
 		this.context = context;
+
+		this.flg_self_only = 1; //こっちのコンストラクタはsummaryFragmentからなので、スターは表示しない
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
 
 
-	public SummaryAdapter(Context context, List<SummaryItem> objects, String team_resource_id, int role_self) {
+	public SummaryAdapter(Context context, List<SummaryItem> objects, String team_resource_id, int role_self, String ipp_auth_key) {
 		super(context, 0,  objects);
 		this.team_resource_id  = team_resource_id;
 		this.role_self = role_self;
 		this.context = context;
+		this.ipp_auth_key = ipp_auth_key;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
@@ -109,6 +122,25 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 		((TextView)convertView.findViewById(R.id.co2_in_summary)).setText(String.valueOf(nf.format(item.getCo2())));
 
 		((TextView)convertView.findViewById(R.id.price_in_summary)).setText(String.valueOf(nf.format(item.getPrice())));
+
+
+
+		//評価ボタン押す
+		number_of_star = (TextView) convertView.findViewById(R.id.number_of_star);
+		buton_evaluate_it = (Button)convertView.findViewById(R.id.buton_evaluate_it);
+
+		buton_evaluate_it.setOnClickListener(new StarCallback(item, ipp_auth_key, context, number_of_star));
+
+		//スター
+		if(flg_self_only != 1){
+			number_of_star.setText(String.valueOf(item.getStar()));
+		}else{
+			((LinearLayout) convertView.findViewById(R.id.wrapper_star)).setVisibility(View.GONE);
+			buton_evaluate_it.setVisibility(View.GONE);
+		}
+
+
+
 
 		return convertView;
 

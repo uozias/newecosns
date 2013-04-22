@@ -210,4 +210,60 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+
+    <!--  -->
+	     <LinearLayout
+            android:id="@+id/wrapper_star"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+              <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"
+                android:src="@android:drawable/star_on" />
+
+
+            <TextView
+                android:id="@+id/label_of_number_of_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:text="@string/label_of_number_of_star"
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/number_of_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+        </LinearLayout>
+
+	     <Button
+	         android:id="@+id/buton_evaluate_it"
+	         style="?android:attr/buttonStyleSmall"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:text="@string/buton_evaluate_it"
+	         android:layout_gravity="right"
+	         android:textSize="28sp"
+	          android:drawableLeft="@android:drawable/star_big_on"
+	         >
+
+	         </Button>>
+
+
+
+
 </LinearLayout>

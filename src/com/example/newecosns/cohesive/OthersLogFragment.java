@@ -568,7 +568,7 @@ public class OthersLogFragment extends SherlockFragment {
 			List<SummaryItem> summary_item_list = new ArrayList<SummaryItem>(Arrays.asList(summary_item_array));
 
 
-			SummaryAdapter summary_adapter = new SummaryAdapter(getSherlockActivity().getApplicationContext(), summary_item_list, team_resource_id, role_self);
+			SummaryAdapter summary_adapter = new SummaryAdapter(getSherlockActivity(), summary_item_list, team_resource_id, role_self, ipp_auth_key);
 
 			try{
 				list_of_summary.setAdapter(summary_adapter);

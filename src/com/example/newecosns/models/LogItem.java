@@ -59,6 +59,10 @@ public class LogItem extends IPPApplicationResource  {
 	String pair_resource_id = null;
 	String pair_common_id = null;
 
+
+	//すたー
+	int star = 0;
+
 	@Override
 	@JsonIgnore
 	public String getResourceName() {
@@ -448,6 +452,20 @@ public class LogItem extends IPPApplicationResource  {
 
 	public void setPair_resource_id(String pair_resource_id) {
 		this.pair_resource_id = pair_resource_id;
+	}
+
+
+
+
+	public int getStar() {
+		return star;
+	}
+
+
+
+
+	public void setStar(int star) {
+		this.star = star;
 	}
 
 

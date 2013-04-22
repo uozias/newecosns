@@ -106,5 +106,7 @@
 	<string name="name_role_senpai">先輩</string>
 	<string name="name_role_kouhai">後輩</string>
 	<string name="label_mutter_mixed">つぶやく</string>
+	<string name="label_of_number_of_star">×</string>
+	<string name="buton_evaluate_it">評価する</string>
 
 </resources>
