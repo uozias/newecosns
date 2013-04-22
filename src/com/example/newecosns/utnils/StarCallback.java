@@ -4,6 +4,7 @@ import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPApplicationResource;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import com.example.newecosns.models.SummaryItem;
 
 public class StarCallback implements OnClickListener {
 
+	protected static final String TAG = "StarCallback";
 	private IPPApplicationResource item;
 	private String ipp_auth_key;
 	private Context context;
@@ -46,7 +48,7 @@ public class StarCallback implements OnClickListener {
 
 			@Override
 			public void ippDidError(int arg0) {
-				// TODO 自動生成されたメソッド・スタブ
+				Log.d(TAG,String.valueOf(arg0));
 
 			}
 
@@ -55,7 +57,16 @@ public class StarCallback implements OnClickListener {
 				//ビュー上で星の数を増やす
 
 				//一回増やしたら読み込み直さないと二度は押せない
-				number_of_star.setText(String.valueOf(Integer.parseInt(number_of_star.getText().toString())+1));
+
+
+
+
+				String num_of_star = number_of_star.getText().toString();
+				if(num_of_star.equals("")){
+					num_of_star = "0";
+				}
+				number_of_star.setText(String.valueOf(Integer.parseInt(num_of_star.toString())+1));
+
 				buton_evaluate_it.setEnabled(false);
 
 			}
