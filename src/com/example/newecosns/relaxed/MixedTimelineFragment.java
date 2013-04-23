@@ -12,8 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
-import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
 import jp.innovationplus.ipp.client.IPPGeoLocationClient;
+import jp.innovationplus.ipp.client.IPPGeoResourceClient;
+import jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPApplicationResource;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
@@ -69,6 +70,8 @@ import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.MainActivity;
 import com.example.newecosns.OAuthActivity;
 import com.example.newecosns.R;
+import com.example.newecosns.geomodel.CommentGeoResource;
+import com.example.newecosns.geomodel.LogGeoResource;
 import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.PairItem;
@@ -116,6 +119,8 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	private int addget_menu_id = 5;
 	private int near_menu_id = 6;
 
+	MenuItem  nearMenu  = null;
+
 	//twitter OAuthデータ保存用
 	SharedPreferences pref;
 	SharedPreferences.Editor editor;
@@ -160,6 +165,10 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 	private long since;
 	private long until;
+
+
+	private int near = 0;
+	private int radiusSquare = 5000;
 
 	CommentItem last_timestamp_holder_comment = null;
 	LogItem last_timestamp_holder_log = null;
@@ -228,7 +237,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 			((TextView) getSherlockActivity().findViewById(R.id.label_kouhai)).setVisibility(View.GONE);
 			((TextView) getSherlockActivity().findViewById(R.id.label_senpai)).setVisibility(View.GONE);
 
-			showMixedList(target_year, target_month, 0);
+			showMixedList(target_year, target_month, 0, near);
 
 		}
 
@@ -559,7 +568,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 			geo_location_client.setAuthKey(ipp_auth_key);
 			geo_location_client.create(geo_location, new geoPostCallback());
 
-			showMixedList(target_year, target_month, 0);
+			showMixedList(target_year, target_month, 0, near);
 
 		}
 
@@ -622,11 +631,11 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		 */
 
 		//近くに限る
-		MenuItem  near  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
-		near.setIcon(android.R.drawable.ic_menu_compass);
+		nearMenu  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
+		nearMenu.setIcon(android.R.drawable.ic_menu_compass);
 		//near.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); アクションバー上にアイコンで表示
 
-		near.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
+		nearMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
 
 
 	}
@@ -659,7 +668,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 		//リロード
 		if (item.getItemId() == reload_menu_id) { //自分の家計簿のみ/他人の家計簿もをきりかえ
-			showMixedList(target_year, target_month, 0);
+			showMixedList(target_year, target_month, 0, near);
 
 		}
 
@@ -668,7 +677,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		if(item.getItemId() == addget_menu_id){
 
 
-			showMixedList(target_year, target_month, last_timestamp);
+			showMixedList(target_year, target_month, last_timestamp, near);
 		}
 
 		//ストレス変更
@@ -682,6 +691,20 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 		}
 		 */
+
+		//近くに限る
+		if(item.getItemId() == near_menu_id){
+			if(near == 0){
+				near =1 ;
+				showMixedList(target_year, target_month, 0, near);
+				nearMenu.setTitle(R.string.near_cancel);
+			}else{
+				near =0;
+				showMixedList(target_year, target_month, 0, near);
+				nearMenu.setTitle(R.string.near);
+			}
+
+		}
 
 
 	return false;
@@ -713,7 +736,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 
 //IPPからコメント読み込むメソッド
-	public void showMixedList(int target_year, int target_month, long until) {
+	public void showMixedList(int target_year, int target_month, long until, int near) {
 		//オンラインなら外部DBから他人のデータ読み出し//
 		try{
 			waitBar.setVisibility(View.VISIBLE);
@@ -727,11 +750,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 			adapter.clear(); //リスト初期化
 
 
-			//コメントの方
-			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-			public_resource_client.setAuthKey(ipp_auth_key);
-			QueryCondition condition = new QueryCondition();
-			condition.setCount(10);
+
 
 
 			//読みだすデータの日時の範囲を指定
@@ -775,17 +794,23 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 			}
 
+			//コメントの方
+			IPPGeoResourceClient public_resource_client = new IPPGeoResourceClient(getActivity().getApplicationContext());
+			public_resource_client.setAuthKey(ipp_auth_key);
+			QueryCondition condition = new QueryCondition();
+			condition.setCount(10);
+
 			condition.setSince(since);
 			condition.setUntil(mUntil);
 			condition.eq("pair_common_id",pair_common_id);
 
-			//この辺り、流れが結構複雑
-			//追加じゃない場合、commentGetCallback→logGetCallback
-			//追加の場合、AdditionalCommentGetCallback→Additional
+			if(near == 1){
+				condition.setBoundByRadiusSquare(mNowLocation.getLatitude(), mNowLocation.getLongitude(), radiusSquare);
+
+			}
 
 
-
-			public_resource_client.query(CommentItem.class, condition, new CommentGetCallback(mUntil)); //最初
+			public_resource_client.query(CommentGeoResource.class, condition, new CommentGetCallback(mUntil)); //最初
 
 
 
@@ -798,7 +823,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //コメント取得コールバック
-	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
+	public class CommentGetCallback implements IPPQueryCallback<CommentGeoResource[]> {
 
 		private long mUntil = 0;
 
@@ -814,24 +839,22 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		}
 
 		@Override
-		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
+		public void ippDidFinishLoading(CommentGeoResource[] comment_geo_item_array) {
 			//ログを読み込む
-			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
+
 			QueryCondition condition = new QueryCondition();
-			public_resource_client.setAuthKey(ipp_auth_key);
-			condition .setCount(10);
 
 			//IPPプラットフォームから取得したコメントのリスト
 			//そのままだと配列なので、リストにする
 			IPPPublicResourceListTmp = new ArrayList<IPPApplicationResource>();
-			if(comment_item_array.length != 0){
+			if(comment_geo_item_array.length != 0){
 
-				for(CommentItem item: Arrays.asList(comment_item_array)){
-					IPPPublicResourceListTmp.add(item);
+				for(CommentGeoResource item: Arrays.asList(comment_geo_item_array)){
+					IPPPublicResourceListTmp.add(item.getResource());
 				}
 
 
-				last_timestamp_holder_comment = comment_item_array[comment_item_array.length -1];
+				last_timestamp_holder_comment = comment_geo_item_array[comment_geo_item_array.length -1].getResource();
 				last_timestamp = last_timestamp_holder_comment.getTimestamp() -1; //最後の要素のタイムスタンプを得る(1秒過去にしておく)
 
 				condition.setSince(last_timestamp);//一番古いコメントの入力時刻から
@@ -843,10 +866,20 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 			}
 
+			IPPGeoResourceClient public_resource_client = new IPPGeoResourceClient(getActivity().getApplicationContext());
+
+			public_resource_client.setAuthKey(ipp_auth_key);
+			condition .setCount(10);
+
 			condition.setUntil(mUntil); //コメント読み込み限界まで
 			condition.eq("pair_common_id",pair_common_id);
 			condition.build();
-			public_resource_client.query(LogItem.class, condition, new LogGetCallback()); //最初のよみこみ
+
+			if(near == 1){
+				condition.setBoundByRadiusSquare(mNowLocation.getLatitude(), mNowLocation.getLongitude(), radiusSquare);
+			}
+
+			public_resource_client.query(LogGeoResource.class, condition, new LogGetCallback()); //最初のよみこみ
 
 
 		}
@@ -855,21 +888,21 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //IPPプラットフォーム上からログをを読み込むコールバック
-	private class LogGetCallback implements IPPQueryCallback <LogItem[]>{
+	private class LogGetCallback implements IPPQueryCallback <LogGeoResource[]>{
 
 
 
 		@Override
-		public void ippDidFinishLoading(LogItem[] log_item_array) {
+		public void ippDidFinishLoading(LogGeoResource[] log_geo_item_array) {
 
-			if(log_item_array.length != 0){
-				for(LogItem item : Arrays.asList(log_item_array)){
-					IPPPublicResourceListTmp.add(item);
+			if(log_geo_item_array.length != 0){
+				for(LogGeoResource item : Arrays.asList(log_geo_item_array)){
+					IPPPublicResourceListTmp.add(item.getResource());
 				}
 
 
-				if(last_timestamp > log_item_array[log_item_array.length -1].getTimestamp()){
-					last_timestamp = log_item_array[log_item_array.length -1].getTimestamp() -1;
+				if(last_timestamp > log_geo_item_array[log_geo_item_array.length -1].getResource().getTimestamp()){
+					last_timestamp = log_geo_item_array[log_geo_item_array.length -1].getResource().getTimestamp() -1;
 				}
 
 			}
@@ -1138,7 +1171,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
 				target_year = calendar.get(Calendar.YEAR);
 				target_month = calendar.get(Calendar.MONTH);
-				showMixedList(target_year,target_month , 0);
+				showMixedList(target_year,target_month , 0, near);
 
 			}
 		});
@@ -1151,7 +1184,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
 				target_year = calendar.get(Calendar.YEAR);
 				target_month = calendar.get(Calendar.MONTH);
-				showMixedList(target_year,target_month , 0);
+				showMixedList(target_year,target_month , 0, near);
 
 			}
 		});
@@ -1185,7 +1218,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		                            	  calendar.set(yearView.getValue(), monthView.getValue(), 1, 0, 0, 0);
 			                      			target_year = calendar.get(Calendar.YEAR);
 			                    			target_month = calendar.get(Calendar.MONTH);
-			                    			showMixedList(target_year,target_month , 0);
+			                    			showMixedList(target_year,target_month , 0, near);
 
 		                              }
 		                          })
@@ -1212,7 +1245,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		                            	  calendar.set(datePicker.getYear(), datePicker.getMonth(), 1, 0, 0, 0);
 		                            		target_year = calendar.get(Calendar.YEAR);
 			                    			target_month = calendar.get(Calendar.MONTH);
-			                    			showMixedList(target_year,target_month , 0);
+			                    			showMixedList(target_year,target_month , 0, near);
 
 		                              }
 		                          })
