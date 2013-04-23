@@ -11,6 +11,7 @@ import java.util.List;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
 import jp.innovationplus.ipp.client.IPPGeoLocationClient;
+import jp.innovationplus.ipp.client.IPPGeoResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
 
@@ -62,6 +63,7 @@ import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.MainActivity;
 import com.example.newecosns.OAuthActivity;
 import com.example.newecosns.R;
+import com.example.newecosns.geomodel.CommentGeoResource;
 import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
@@ -409,11 +411,37 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					commentItem.setCommentParentResourceId(comment_parent_id_new.getText().toString());
 
 					//送信
-					IPPApplicationResourceClient client = new IPPApplicationResourceClient(getSherlockActivity());
+					//IPPApplicationResourceClient client = new IPPApplicationResourceClient(getSherlockActivity());
+					//client.setAuthKey(ipp_auth_key);
+					//client.setDebugMessage(true);
+
+					//client.create(CommentItem.class, commentItem, new SendCommentCallback());
+
+
+					//位置情報用リソース
+					IPPGeoLocation geo_location = new IPPGeoLocation();
+					geo_location.setLongitude(mNowLocation.getLongitude());
+					geo_location.setLatitude(mNowLocation.getLatitude());
+					geo_location.setAccuracy(mNowLocation.getAccuracy());
+					geo_location.setTimestamp(mNowLocation.getTime());
+
+					geo_location.setProvider(mNowLocation.getProvider());
+
+
+					List<IPPGeoLocation> geoLocations = new ArrayList();
+					geoLocations.add(geo_location) ;
+
+					CommentGeoResource resource= new CommentGeoResource();
+					resource.setResource(commentItem);
+					resource.setGeolocations(geoLocations);
+
+					IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
 					client.setAuthKey(ipp_auth_key);
 					client.setDebugMessage(true);
+					client.create(CommentGeoResource.class, resource, new geoPostCallback());
 
-					client.create(CommentItem.class, commentItem, new SendCommentCallback());
+
+
 
 					}
 				//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//debug
@@ -421,6 +449,23 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			}
 
 		});
+	}
+
+
+	//位置情報送信後のコールバック
+	class geoPostCallback implements IPPQueryCallback<String> {
+
+	@Override
+		public void ippDidError(int arg0) {
+			Log.d(TAG, String.valueOf(arg0));
+
+		}
+
+
+		@Override
+		public void ippDidFinishLoading(String arg0) {
+			Log.d(TAG, String.valueOf(arg0));
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -514,21 +559,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	//位置情報送信後のコールバック
-	class geoPostCallback implements IPPQueryCallback<String> {
 
-	@Override
-		public void ippDidError(int arg0) {
-			Log.d(TAG, getString(arg0));
-
-		}
-
-
-		@Override
-		public void ippDidFinishLoading(String arg0) {
-			Log.d(TAG, arg0);
-		}
-	}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
