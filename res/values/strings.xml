@@ -108,6 +108,7 @@
 	<string name="label_mutter_mixed">つぶやく</string>
 	<string name="label_of_number_of_star">×</string>
 	<string name="buton_evaluate_it">評価する</string>
-	<string name="near">この近くでは？</string>
+	<string name="near">この近くだけ表示</string>
+	<string name="near_cancel">近く以外も表示</string>
 
 </resources>

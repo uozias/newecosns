@@ -1309,6 +1309,7 @@ containing a value of this type.
         public static final int name_role_kouhai=0x7f0a0075;
         public static final int name_role_senpai=0x7f0a0074;
         public static final int near=0x7f0a0079;
+        public static final int near_cancel=0x7f0a007a;
         public static final int new_peb=0x7f0a0065;
         public static final int new_product=0x7f0a0064;
         public static final int no_data=0x7f0a0011;

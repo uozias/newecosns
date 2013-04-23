@@ -106,7 +106,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private int addget_menu_id = 5;
 	private int near_menu_id = 6;
 
-
+	MenuItem  nearMenu  = null;
 	//twitter OAuthデータ保存用
 	SharedPreferences pref;
 	SharedPreferences.Editor editor;
@@ -126,6 +126,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private long since;
 	private long until;
 
+	private int near = 0;
 
     ListView listView = null;
     Calendar calendar = null;
@@ -150,6 +151,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 	//入力チェック
 	private boolean user_inputted = false;
+
+
+	//検索範囲
+	private int radiusSquare = 5000;//単位メートル?
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -220,7 +226,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		//IPPからコメント読み込む
 		//更に読みこむ機能の実装
-		showCommentList(target_year, target_month, 0);
+		showCommentList(target_year, target_month, 0, near);
 	}
 
 
@@ -420,6 +426,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					IPPGeoLocation geo_location = new IPPGeoLocation();
 					geo_location.setLongitude(mNowLocation.getLongitude());
 					geo_location.setLatitude(mNowLocation.getLatitude());
+
+					//testdata
+					//geo_location.setLongitude(141.157322);
+					//geo_location.setLatitude(43.143333);
+
 					geo_location.setAccuracy(mNowLocation.getAccuracy());
 					geo_location.setTimestamp(mNowLocation.getTime());
 
@@ -484,7 +495,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				geo_location_client.create(geo_location, new geoPostCallback());
 				*/
 
-				showCommentList(target_year, target_month, 0);
+				showCommentList(target_year, target_month, 0, near);
 
 			}
 
@@ -585,11 +596,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		*/
 
 		//近くに限る
-		MenuItem  near  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
-		near.setIcon(android.R.drawable.ic_menu_compass);
+		nearMenu  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
+		nearMenu.setIcon(android.R.drawable.ic_menu_compass);
 		//near.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); アクションバー上にアイコンで表示
 
-		near.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
+		nearMenu.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
 
 	}
 
@@ -621,7 +632,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		//リロード
 		if (item.getItemId() == reload_menu_id) {
-			showCommentList(target_year, target_month, 0);
+			showCommentList(target_year, target_month, 0, near);
 
 		}
 
@@ -635,7 +646,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			}catch (NullPointerException e){
 
 			}
-			showCommentList(target_year, target_month, until);
+			showCommentList(target_year, target_month, until, near);
 		}
 
 		//ストレス変更
@@ -653,7 +664,15 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		//近くに限る
 		if(item.getItemId() == near_menu_id){
-
+			if(near == 0){
+				near =1 ;
+				showCommentList(target_year, target_month, 0, near);
+				nearMenu.setTitle(R.string.near_cancel);
+			}else{
+				near =0;
+				showCommentList(target_year, target_month, 0, near);
+				nearMenu.setTitle(R.string.near);
+			}
 
 		}
 
@@ -662,7 +681,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //IPPからコメント読み込むメソッド
-	public void showCommentList(int target_year, int target_month, long until) {
+	public void showCommentList(int target_year, int target_month, long until, int near) {
 		//オンラインなら外部DBから他人のデータ読み出し//
 		try{
 			waitBar.setVisibility(View.VISIBLE);
@@ -721,19 +740,20 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext()) ;
 			client.setAuthKey(ipp_auth_key);
 
-			//IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getSherlockActivity().getApplicationContext());
-			//public_resource_client.setAuthKey(ipp_auth_key);
-
-			//QueryCondition condition = new QueryCondition();
-			//condition.setCount(10);
 
 			jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition condition = new jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition();
 
 			condition.setSince(since);
 			condition.setUntil(mUntil);
+			condition.setCount(10);
 			condition.eq("pair_common_id",pair_common_id);
 
-			//public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback());
+			if(near == 1){
+				condition.setBoundByRadiusSquare(mNowLocation.getLatitude(), mNowLocation.getLongitude(), radiusSquare);
+
+			}
+
+			condition.build();
 			client.query(CommentGeoResource.class ,condition, new CommentGeoGetCallback());
 
 
@@ -1202,7 +1222,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
 				target_year = calendar.get(Calendar.YEAR);
 				target_month = calendar.get(Calendar.MONTH);
-				showCommentList(target_year,target_month , 0);
+				showCommentList(target_year,target_month , 0, near);
 
 			}
 		});
@@ -1215,7 +1235,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				this_month.setText(String.valueOf(calendar.get(Calendar.MONTH)+1)+"月");
 				target_year = calendar.get(Calendar.YEAR);
 				target_month = calendar.get(Calendar.MONTH);
-				showCommentList(target_year,target_month , 0);
+				showCommentList(target_year,target_month , 0, near);
 
 			}
 		});
@@ -1249,7 +1269,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		                            	  calendar.set(yearView.getValue(), monthView.getValue(), 1, 0, 0, 0);
 			                      			target_year = calendar.get(Calendar.YEAR);
 			                    			target_month = calendar.get(Calendar.MONTH);
-			                    			showCommentList(target_year,target_month , 0);
+			                    			showCommentList(target_year,target_month , 0, near);
 
 		                              }
 		                          })
@@ -1276,7 +1296,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		                            	  calendar.set(datePicker.getYear(), datePicker.getMonth(), 1, 0, 0, 0);
 		                            		target_year = calendar.get(Calendar.YEAR);
 			                    			target_month = calendar.get(Calendar.MONTH);
-			                    			showCommentList(target_year,target_month , 0);
+			                    			showCommentList(target_year,target_month , 0, near);
 
 		                              }
 		                          })
