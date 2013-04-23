@@ -16,7 +16,7 @@ import java.util.List;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
-import jp.innovationplus.ipp.client.IPPGeoLocationClient;
+import jp.innovationplus.ipp.client.IPPGeoResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
 
@@ -79,6 +79,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.example.newecosns.geomodel.LogGeoResource;
 import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.MarkItem;
 import com.example.newecosns.models.PEBItem;
@@ -102,6 +103,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 	static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
 	static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
 	static final int REQUEST_OAUTH = 1;
+
 	static final String hash_tag = "ecosns_test";
 	private static long user_id = 0L;
 	private static String screen_name = null;
@@ -1227,6 +1229,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			}
 
 			//緯度経度精度
+
 			if(mNowLocation != null){
 				log_item_edited.setLongitude(mNowLocation.getLongitude());
 				log_item_edited.setLatitude(mNowLocation.getLatitude());
@@ -1234,6 +1237,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 				log_item_edited.setProvider(mNowLocation.getProvider());
 
 			}
+
 
 			//プラットフォーム用タイムスタンプ
 			log_item_edited.setTimestamp(timestamp.getTime());
@@ -1353,18 +1357,37 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			sendPicture(); //写真を送る
 		}else{
 
+
+
 			//写真(IPP)
 			log_item_edited.setPicture_resource_id(sended_picture_resource_id);
 			log_item_edited.setPicture(null); //プラットフォームではlogと写真のモデルは分離
+
+			//位置情報用リソース
+			IPPGeoLocation geo_location = new IPPGeoLocation();
+			geo_location.setLongitude(mNowLocation.getLongitude());
+			geo_location.setLatitude(mNowLocation.getLatitude());
+			geo_location.setAccuracy(mNowLocation.getAccuracy());
+			geo_location.setTimestamp(mNowLocation.getTime());
+			geo_location.setProvider(mNowLocation.getProvider());
+
+
+			List<IPPGeoLocation> geoLocations = new ArrayList();
+			geoLocations.add(geo_location) ;
+
+			LogGeoResource resource = new LogGeoResource();
+			resource.setResource(log_item_edited);
+			resource.setGeolocations(geoLocations);
 
 
 			//圏外でなければ
 			if(NetworkManager.isConnected(InputLogActivity.this.getApplicationContext())){
 
-				IPPApplicationResourceClient client = new IPPApplicationResourceClient(InputLogActivity.this);
+				IPPGeoResourceClient client = new IPPGeoResourceClient(this.getApplicationContext());
 				client.setAuthKey(ipp_auth_key);
 				client.setDebugMessage(true);
-				client.create(LogItem.class, log_item_edited, new InputLogCallback());
+				client.create(LogGeoResource.class, resource, new InputLogCallback());
+
 
 			}else{
 				//圏外だったら
@@ -1375,7 +1398,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 			//メインアクティビティ(家計簿まとめ画面)に戻る
 			sdb.close();
 
-	
+
 
 			Intent intent = new Intent(InputLogActivity.this, MainActivity.class);
 			startActivity(intent);
@@ -1402,7 +1425,9 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 		@Override
 		public void ippDidFinishLoading(String resource_id) {
 		//登録したlogのリソースidを返してくれるらしい
+			Toast.makeText(InputLogActivity.this, "家計簿送信成功", Toast.LENGTH_SHORT).show();
 
+			/*
 			if(resource_id != null){
 				IPPGeoLocation geo_location = new IPPGeoLocation();
 				geo_location.setLongitude(mNowLocation.getLongitude());
@@ -1416,6 +1441,7 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 				geo_location_client.setAuthKey(ipp_auth_key);
 				geo_location_client.create(geo_location, new geoPostCallback());
 			}
+			*/
 		}
 	  }
 

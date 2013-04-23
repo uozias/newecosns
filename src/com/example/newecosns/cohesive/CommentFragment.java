@@ -8,9 +8,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
-import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
-import jp.innovationplus.ipp.client.IPPGeoLocationClient;
 import jp.innovationplus.ipp.client.IPPGeoResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import jp.innovationplus.ipp.jsontype.IPPGeoLocation;
@@ -107,6 +104,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private int reload_menu_id = 3;
 	private int stress_change_menu_id = 4;
 	private int addget_menu_id = 5;
+	private int near_menu_id = 6;
 
 
 	//twitter OAuthデータ保存用
@@ -397,10 +395,10 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					commentItem.setCommentScreenName(ipp_screen_name);
 
 					//緯度経度精度
-					commentItem.setLongitude(mNowLocation.getLongitude());
-					commentItem.setLatitude(mNowLocation.getLatitude());
-					commentItem.setAccuracy(mNowLocation.getAccuracy());
-					commentItem.setProvider(mNowLocation.getProvider());
+					//commentItem.setLongitude(mNowLocation.getLongitude());
+					//commentItem.setLatitude(mNowLocation.getLatitude());
+					//commentItem.setAccuracy(mNowLocation.getAccuracy());
+					//commentItem.setProvider(mNowLocation.getProvider());
 
 					//チームid
 					commentItem.setTeam_resource_id(team_resource_id);
@@ -438,35 +436,59 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
 					client.setAuthKey(ipp_auth_key);
 					client.setDebugMessage(true);
-					client.create(CommentGeoResource.class, resource, new geoPostCallback());
+					client.create(CommentGeoResource.class, resource, new SendCommentCallback());
 
 
 
 
 					}
-				//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//debug
+
 
 			}
 
 		});
 	}
 
+	//コメント送信後のコールバック
+		public class SendCommentCallback implements IPPQueryCallback<String> {
 
-	//位置情報送信後のコールバック
-	class geoPostCallback implements IPPQueryCallback<String> {
+			@Override
+			public void ippDidError(int arg0) {
+				Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿失敗", Toast.LENGTH_LONG).show();
 
-	@Override
-		public void ippDidError(int arg0) {
-			Log.d(TAG, String.valueOf(arg0));
+			}
+
+			@Override
+			public void ippDidFinishLoading(String resource_id) {
+				Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿成功", Toast.LENGTH_LONG).show();
+				//ソフトキー外す
+				InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(
+						Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
+				((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
+
+				//GEO Resourceを使うのでいらない
+				/*
+				IPPGeoLocation geo_location = new IPPGeoLocation();
+				geo_location.setLongitude(mNowLocation.getLongitude());
+				geo_location.setLatitude(mNowLocation.getLatitude());
+				geo_location.setAccuracy(mNowLocation.getAccuracy());
+				geo_location.setTimestamp(mNowLocation.getTime());
+
+				geo_location.setProvider(mNowLocation.getProvider());
+				geo_location.setResource_id(resource_id);
+
+
+				IPPGeoLocationClient geo_location_client = new IPPGeoLocationClient(getSherlockActivity());
+				geo_location_client.setAuthKey(ipp_auth_key);
+				geo_location_client.create(geo_location, new geoPostCallback());
+				*/
+
+				showCommentList(target_year, target_month, 0);
+
+			}
 
 		}
-
-
-		@Override
-		public void ippDidFinishLoading(String arg0) {
-			Log.d(TAG, String.valueOf(arg0));
-		}
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//ログインチェック
@@ -520,42 +542,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//コメント送信後のコールバック
-	public class SendCommentCallback implements IPPQueryCallback<String> {
 
-		@Override
-		public void ippDidError(int arg0) {
-			Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿失敗", Toast.LENGTH_LONG).show();
-
-		}
-
-		@Override
-		public void ippDidFinishLoading(String resource_id) {
-			Toast.makeText(getSherlockActivity().getApplicationContext(), "コメント投稿成功", Toast.LENGTH_LONG).show();
-			//ソフトキー外す
-			InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(
-					Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
-			((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
-
-			IPPGeoLocation geo_location = new IPPGeoLocation();
-			geo_location.setLongitude(mNowLocation.getLongitude());
-			geo_location.setLatitude(mNowLocation.getLatitude());
-			geo_location.setAccuracy(mNowLocation.getAccuracy());
-			geo_location.setTimestamp(mNowLocation.getTime());
-
-			geo_location.setProvider(mNowLocation.getProvider());
-			geo_location.setResource_id(resource_id);
-
-			IPPGeoLocationClient geo_location_client = new IPPGeoLocationClient(getSherlockActivity());
-			geo_location_client.setAuthKey(ipp_auth_key);
-			geo_location_client.create(geo_location, new geoPostCallback());
-
-			showCommentList(target_year, target_month, 0);
-
-		}
-
-	}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -595,7 +582,14 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		MenuItem stress_change = menu.add(0, stress_change_menu_id, Menu.NONE, getString(R.string.stress_change));
 		stress_change.setIcon(android.R.drawable.ic_menu_preferences);
 		stress_change.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-*/
+		*/
+
+		//近くに限る
+		MenuItem  near  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
+		near.setIcon(android.R.drawable.ic_menu_compass);
+		//near.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); アクションバー上にアイコンで表示
+
+		near.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
 
 	}
 
@@ -657,7 +651,13 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		}
 		*/
 
-	return false;
+		//近くに限る
+		if(item.getItemId() == near_menu_id){
+
+
+		}
+
+		return false;
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -674,11 +674,6 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
 			adapter.clear();
 
-			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-			public_resource_client.setAuthKey(ipp_auth_key);
-
-			QueryCondition condition = new QueryCondition();
-			condition.setCount(10);
 
 
 			//読みだすデータの日時の範囲を指定
@@ -723,21 +718,112 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 			}
 
+			IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext()) ;
+			client.setAuthKey(ipp_auth_key);
+
+			//IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getSherlockActivity().getApplicationContext());
+			//public_resource_client.setAuthKey(ipp_auth_key);
+
+			//QueryCondition condition = new QueryCondition();
+			//condition.setCount(10);
+
+			jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition condition = new jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition();
+
 			condition.setSince(since);
 			condition.setUntil(mUntil);
 			condition.eq("pair_common_id",pair_common_id);
 
-			public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback()); //最初
-
-
+			//public_resource_client.query(CommentItem.class ,condition, new CommentGetCallback());
+			client.query(CommentGeoResource.class ,condition, new CommentGeoGetCallback());
 
 
 		}
 
+
 	}
+	public class CommentGeoGetCallback implements IPPQueryCallback<CommentGeoResource[]> {
+
+
+
+		@Override
+		public void ippDidError(int paramInt) {
+			Toast.makeText(CommentFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void ippDidFinishLoading(CommentGeoResource[] comment_geo_item_array) {
+			//IPPプラットフォームから取得したコメントのリスト
+			//そのままだと配列なので、リストにする
+
+
+			if(comment_geo_item_array.length != 0 ){
+				last_timestamp = comment_geo_item_array[comment_geo_item_array.length -1].getResource().getTimestamp() -1; //最後の要素のタイムスタンプを得る
+
+
+				List<CommentItem> CommentItemList = new ArrayList<CommentItem>();
+				for (int i = 0; i < comment_geo_item_array.length ; i++){
+
+					CommentItemList.add(comment_geo_item_array[i].getResource());
+				}
+
+				Collections.sort(CommentItemList, new PublicResourceComparatorInverse());
+
+				if(until == 0){ //初期よみこみ
+					for(CommentItem commentItem : CommentItemList){
+
+						adapter.add(commentItem);
+					}
+
+
+
+
+					try{
+						listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+						listView.setAdapter(adapter);
+						//終わったら成功のトースト出す
+						Toast toast = Toast.makeText(getSherlockActivity(), "コメント読み込み成功", Toast.LENGTH_LONG);
+						toast.show();
+
+					} catch (NullPointerException e){
+						Log.d("BACK GROUND", "writing timeline error");
+					}
+
+				}else{ //追加読み込み
+
+
+					for(CommentItem commentItem : CommentItemList){
+
+						adapter.add(commentItem);
+					}
+
+
+				}
+
+			}
+
+
+
+			//プログレスバー隠す
+			try{
+				waitBar.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
+			}catch (NullPointerException e){
+
+			}
+		}
+
+
+
+	}
+
+
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //コメント取得コールバック
+//TODO 使ってない？
 	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
 
 
@@ -949,9 +1035,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			number_of_star = (TextView) convertView.findViewById(R.id.number_of_star);
 			buton_evaluate_it.setOnClickListener(new StarCallback(item, ipp_auth_key, context, number_of_star));
 
-			if(item.getStar() != 0){
-				number_of_star.setText(String.valueOf(item.getStar()));
-			}
+
+			number_of_star.setText(String.valueOf(item.getStar()));
+
 
 
 

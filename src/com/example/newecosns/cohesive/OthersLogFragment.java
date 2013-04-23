@@ -103,7 +103,7 @@ public class OthersLogFragment extends SherlockFragment {
 	private int ipp_login_menu_id = 1;
 	private int reload_menu_id = 2;
 	private int addget_menu_id = 5;
-
+	private int near_menu_id = 6;
 	//PEBリスト
 	private HashMap<String, PEBItem> peb_list = null;
 
@@ -610,6 +610,12 @@ public class OthersLogFragment extends SherlockFragment {
 		addget.setIcon(android.R.drawable.ic_menu_preferences);
 		addget.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
+		//近くに限る
+		MenuItem  near  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
+		near.setIcon(android.R.drawable.ic_menu_compass);
+		//near.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); アクションバー上にアイコンで表示
+
+		near.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
 
 
 	}

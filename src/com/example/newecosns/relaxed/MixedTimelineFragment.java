@@ -114,6 +114,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	private int reload_menu_id = 3;
 	private int stress_change_menu_id = 4;
 	private int addget_menu_id = 5;
+	private int near_menu_id = 6;
 
 	//twitter OAuthデータ保存用
 	SharedPreferences pref;
@@ -620,6 +621,12 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		stress_change.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		 */
 
+		//近くに限る
+		MenuItem  near  = menu.add(0, near_menu_id, Menu.NONE, getString(R.string.near));
+		near.setIcon(android.R.drawable.ic_menu_compass);
+		//near.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS); アクションバー上にアイコンで表示
+
+		near.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT); //ドロップダウンのメニューに表示
 
 
 	}

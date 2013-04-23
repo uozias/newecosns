@@ -585,6 +585,7 @@ int string name_model_comment 0x7f0a0072
 int string name_model_log 0x7f0a0073
 int string name_role_kouhai 0x7f0a0075
 int string name_role_senpai 0x7f0a0074
+int string near 0x7f0a0079
 int string new_peb 0x7f0a0065
 int string new_product 0x7f0a0064
 int string no_data 0x7f0a0011
