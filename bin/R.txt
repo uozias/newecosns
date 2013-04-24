@@ -303,11 +303,11 @@ int drawable tw_button_bg 0x7f020098
 int drawable type 0x7f020099
 int id CommentCreatedInList 0x7f05007b
 int id CommentParentIdNew 0x7f050067
-int id CommentParentResourceIdInList 0x7f050082
-int id CommentResourceIdInList 0x7f050083
+int id CommentParentResourceIdInList 0x7f050086
+int id CommentResourceIdInList 0x7f050082
 int id CommentScreenNameInList 0x7f050089
 int id CommentScreenNameInListLeft 0x7f050077
-int id CommentScreenNameInListRight 0x7f050085
+int id CommentScreenNameInListRight 0x7f050084
 int id CommentTextInList 0x7f05007c
 int id IPPScreenName 0x7f050057
 int id InputLogAmountInList 0x7f05008e
@@ -374,7 +374,7 @@ int id abs__title 0x7f05001b
 int id abs__titleDivider 0x7f05001c
 int id abs__up 0x7f05000b
 int id action_dialog_peb_id 0x7f050074
-int id action_settings 0x7f0500b4
+int id action_settings 0x7f0500b6
 int id backToCommentFragment 0x7f05005d
 int id bottom_control_bar 0x7f05006a
 int id buton_evaluate_it 0x7f050081
@@ -403,7 +403,7 @@ int id idPEB 0x7f0500a1
 int id idProduct 0x7f0500a8
 int id imageViewBottom 0x7f050088
 int id imageViewLeft 0x7f050076
-int id imageViewRight 0x7f050084
+int id imageViewRight 0x7f050083
 int id imagesWrapperBottom 0x7f050087
 int id imagesWrapperLeft 0x7f050075
 int id imagesWrapperRight 0x7f050079
@@ -455,6 +455,7 @@ int id showConversation 0x7f050080
 int id showCustom 0x7f050008
 int id showHome 0x7f050005
 int id showTitle 0x7f050007
+int id submitButton 0x7f0500b5
 int id summary_list 0x7f05006f
 int id summary_list_others 0x7f05006d
 int id summary_list_wrapper 0x7f05006c
@@ -468,7 +469,8 @@ int id table_row_product_selected_price 0x7f050048
 int id table_row_product_selected_producer 0x7f050045
 int id takePicBtn 0x7f050051
 int id textPEB 0x7f05009d
-int id text_in_comment_list 0x7f050086
+int id textReply 0x7f0500b4
+int id text_in_comment_list 0x7f050085
 int id text_of_action_dialog 0x7f050073
 int id top_control_bar 0x7f05005e
 int id tweetBtn 0x7f050069
@@ -524,6 +526,7 @@ int layout row_product 0x7f030025
 int layout row_summary 0x7f030026
 int layout sherlock_spinner_dropdown_item 0x7f030027
 int layout sherlock_spinner_item 0x7f030028
+int layout view_reply 0x7f030029
 int menu camera 0x7f0c0000
 int menu ippweb_view 0x7f0c0001
 int menu replies 0x7f0c0002
@@ -588,6 +591,7 @@ int string instruction_input_comment 0x7f0a005c
 int string instruction_peb_list 0x7f0a004b
 int string instruction_place 0x7f0a005e
 int string ipp_login 0x7f0a0031
+int string label_content_reply 0x7f0a007c
 int string label_mutter_mixed 0x7f0a0076
 int string label_of_number_of_star 0x7f0a0077
 int string label_peb_selected_name 0x7f0a006a

@@ -988,11 +988,11 @@ containing a value of this type.
     public static final class id {
         public static final int CommentCreatedInList=0x7f05007b;
         public static final int CommentParentIdNew=0x7f050067;
-        public static final int CommentParentResourceIdInList=0x7f050082;
-        public static final int CommentResourceIdInList=0x7f050083;
+        public static final int CommentParentResourceIdInList=0x7f050086;
+        public static final int CommentResourceIdInList=0x7f050082;
         public static final int CommentScreenNameInList=0x7f050089;
         public static final int CommentScreenNameInListLeft=0x7f050077;
-        public static final int CommentScreenNameInListRight=0x7f050085;
+        public static final int CommentScreenNameInListRight=0x7f050084;
         public static final int CommentTextInList=0x7f05007c;
         public static final int IPPScreenName=0x7f050057;
         public static final int InputLogAmountInList=0x7f05008e;
@@ -1059,7 +1059,7 @@ containing a value of this type.
         public static final int abs__titleDivider=0x7f05001c;
         public static final int abs__up=0x7f05000b;
         public static final int action_dialog_peb_id=0x7f050074;
-        public static final int action_settings=0x7f0500b4;
+        public static final int action_settings=0x7f0500b6;
         public static final int backToCommentFragment=0x7f05005d;
         public static final int bottom_control_bar=0x7f05006a;
         public static final int buton_evaluate_it=0x7f050081;
@@ -1088,7 +1088,7 @@ containing a value of this type.
         public static final int idProduct=0x7f0500a8;
         public static final int imageViewBottom=0x7f050088;
         public static final int imageViewLeft=0x7f050076;
-        public static final int imageViewRight=0x7f050084;
+        public static final int imageViewRight=0x7f050083;
         public static final int imagesWrapperBottom=0x7f050087;
         public static final int imagesWrapperLeft=0x7f050075;
         public static final int imagesWrapperRight=0x7f050079;
@@ -1140,6 +1140,7 @@ containing a value of this type.
         public static final int showCustom=0x7f050008;
         public static final int showHome=0x7f050005;
         public static final int showTitle=0x7f050007;
+        public static final int submitButton=0x7f0500b5;
         public static final int summary_list=0x7f05006f;
         public static final int summary_list_others=0x7f05006d;
         public static final int summary_list_wrapper=0x7f05006c;
@@ -1153,7 +1154,8 @@ containing a value of this type.
         public static final int table_row_product_selected_producer=0x7f050045;
         public static final int takePicBtn=0x7f050051;
         public static final int textPEB=0x7f05009d;
-        public static final int text_in_comment_list=0x7f050086;
+        public static final int textReply=0x7f0500b4;
+        public static final int text_in_comment_list=0x7f050085;
         public static final int text_of_action_dialog=0x7f050073;
         public static final int top_control_bar=0x7f05005e;
         public static final int tweetBtn=0x7f050069;
@@ -1213,6 +1215,7 @@ containing a value of this type.
         public static final int row_summary=0x7f030026;
         public static final int sherlock_spinner_dropdown_item=0x7f030027;
         public static final int sherlock_spinner_item=0x7f030028;
+        public static final int view_reply=0x7f030029;
     }
     public static final class menu {
         public static final int camera=0x7f0c0000;
@@ -1311,6 +1314,7 @@ containing a value of this type.
         public static final int instruction_peb_list=0x7f0a004b;
         public static final int instruction_place=0x7f0a005e;
         public static final int ipp_login=0x7f0a0031;
+        public static final int label_content_reply=0x7f0a007c;
         public static final int label_mutter_mixed=0x7f0a0076;
         public static final int label_of_number_of_star=0x7f0a0077;
         public static final int label_peb_selected_name=0x7f0a006a;

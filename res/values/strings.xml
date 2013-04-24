@@ -111,5 +111,6 @@
 	<string name="near">この近くだけ表示</string>
 	<string name="near_cancel">近く以外も表示</string>
 	<string name="message_network_disabled">圏外です。</string>
+	<string name="label_content_reply">返信の内容</string>
 
 </resources>

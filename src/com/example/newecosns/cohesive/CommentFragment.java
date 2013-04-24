@@ -190,14 +190,17 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 		//IPPログインチェック
-		loginChecked = new CountDownLatch(1);
+		loginChecked = new CountDownLatch(2);
 		ippLoginCheck();
+
+		 //位置情報が利用できるか否かをチェック
+		prepareLocation();
 
 		//アダプタの準備
 		try {
 			loginChecked.await(); //ログインが終わるまで待つ
 			//adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
-			adapter = new CommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self, ipp_auth_key);
+			adapter = new CommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self, ipp_auth_key, mNowLocation);
 
 		} catch (InterruptedException e1) {
 
@@ -206,8 +209,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		//アダプタのインスタンス作成時にteam_resource_idがないと困る
 
 
-	     //位置情報が利用できるか否かをチェック
-		prepareLocation();
+
 
 
 		//コメント投稿ボタンを押したら
@@ -332,6 +334,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	        mLocationManager.requestLocationUpdates(bestProvider, 1000, 1, this);
 
 		}
+
+		 loginChecked.countDown(); //ログイン終了を見てるラッチ
+		 return;
 	}
 
 
@@ -365,126 +370,132 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		*/
 
 		twBtn = (Button) getSherlockActivity().findViewById(R.id.tweetBtn);
-		twBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (v.getId() == R.id.tweetBtn) {
+		twBtn.setOnClickListener(new TapSendCommentListener(twTx,  ipp_id_string,ipp_screen_name,  team_resource_id, pair_common_id, null, mNowLocation));
+	}
 
-					String tweetContent = twTx.getText().toString();
-					if (tweetContent.length() == 0 || user_inputted == false) {
-						Toast toast2 = Toast.makeText(getSherlockActivity().getApplicationContext(), "文を入力して下さい。",
-								Toast.LENGTH_LONG);
-						toast2.show();
-						return;
-					}else{
-						/*
-						if (tweetCheckBox.isChecked()) { //「ツイートする」にチェックが入っていたら
-							//ログインチェックとログイン画面への自動遷移
-							checkLoginTwitter();
+	//コメント送信リスナ
+	class TapSendCommentListener implements View.OnClickListener {
+		private Location mNowLocation = null;
+		private EditText twTx;
+		private String comment_parent_id_new = null;
 
-							//ツイート機能
-							if (tweetContent.length() > 140) {
-								Toast toast = Toast.makeText(getSherlockActivity().getApplicationContext(), "長過ぎます。",
-										Toast.LENGTH_LONG);
-								toast.show();
-							} else {
+		public TapSendCommentListener(EditText twTx, String ipp_id_string, String ipp_screen_name,  String team_resource_id, String pair_common_id, String comment_parent_id_new, Location NowLocation){
+			this.twTx = twTx;
+			this.comment_parent_id_new = comment_parent_id_new;
+			this.mNowLocation = NowLocation;
 
-								Bundle args = new Bundle(1); //onCreateLoaderに渡したい値はここへ
-								args.putString("tweetContent", tweetContent);
-								//getSherlockActivity().getSupportLoaderManager().initLoader(0, args, CommentFragment.this);　 //こっちは自分にローダーを実装する場合
+		}
 
-								TweetAsyncLoaderClass tweet_async_loader_class = new TweetAsyncLoaderClass(CommentFragment.this, token, token_secret, getSherlockActivity().getApplicationContext());
-								getLoaderManager().restartLoader(0, args, tweet_async_loader_class);
-							}
-						}
-						*/
-					}
+		@Override
+		public void onClick(View v) {
 
-					//IPPへコメント投稿
-					CommentItem commentItem = new CommentItem();
 
-					//スター
-					commentItem.setStar(0);
+				String tweetContent = twTx.getText().toString();
 
-					//コメント内容
-					commentItem.setCommentText(tweetContent);
-
-					//現在の日時
-					Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-					commentItem.setCommentCreated(timestamp.toString());
-					commentItem.setTimestamp(timestamp.getTime());
-
-					//ユーザ名(IPP上の)
-					commentItem.setCommentUserName(ipp_id_string);
-
-					//スクリーンネーム
-					commentItem.setCommentScreenName(ipp_screen_name);
-
-					//緯度経度精度
+				if (tweetContent.length() == 0 || user_inputted == false) {
+					Toast toast2 = Toast.makeText(getSherlockActivity().getApplicationContext(), "文を入力して下さい。",
+							Toast.LENGTH_LONG);
+					toast2.show();
+					return;
+				}else{
 					/*
-					if(mNowLocation != null){
-						commentItem.setLongitude(mNowLocation.getLongitude());
-						commentItem.setLatitude(mNowLocation.getLatitude());
-						commentItem.setAccuracy(mNowLocation.getAccuracy());
-						commentItem.setProvider(mNowLocation.getProvider());
+					if (tweetCheckBox.isChecked()) { //「ツイートする」にチェックが入っていたら
+						//ログインチェックとログイン画面への自動遷移
+						checkLoginTwitter();
+
+						//ツイート機能
+						if (tweetContent.length() > 140) {
+							Toast toast = Toast.makeText(getSherlockActivity().getApplicationContext(), "長過ぎます。",
+									Toast.LENGTH_LONG);
+							toast.show();
+						} else {
+
+							Bundle args = new Bundle(1); //onCreateLoaderに渡したい値はここへ
+							args.putString("tweetContent", tweetContent);
+							//getSherlockActivity().getSupportLoaderManager().initLoader(0, args, CommentFragment.this);　 //こっちは自分にローダーを実装する場合
+
+							TweetAsyncLoaderClass tweet_async_loader_class = new TweetAsyncLoaderClass(CommentFragment.this, token, token_secret, getSherlockActivity().getApplicationContext());
+							getLoaderManager().restartLoader(0, args, tweet_async_loader_class);
+						}
 					}
 					*/
+				}
 
-					//チームid
-					commentItem.setTeam_resource_id(team_resource_id);
-					commentItem.setPair_common_id(CommentFragment.this.pair_common_id);
+				//IPPへコメント投稿
+				CommentItem commentItem = new CommentItem();
 
-					//返信
-					TextView comment_parent_id_new = (TextView) CommentFragment.this.getSherlockActivity().findViewById(R.id.CommentParentIdNew);
-					commentItem.setCommentParentResourceId(comment_parent_id_new.getText().toString());
+				//スター
+				commentItem.setStar(0);
 
-					//送信
-					//IPPApplicationResourceClient client = new IPPApplicationResourceClient(getSherlockActivity());
-					//client.setAuthKey(ipp_auth_key);
-					//client.setDebugMessage(true);
+				//コメント内容
+				commentItem.setCommentText(tweetContent);
 
-					//client.create(CommentItem.class, commentItem, new SendCommentCallback());
+				//現在の日時
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				commentItem.setCommentCreated(timestamp.toString());
+				commentItem.setTimestamp(timestamp.getTime());
 
+				//ユーザ名(IPP上の)
+				commentItem.setCommentUserName(ipp_id_string);
 
-					//位置情報用リソース
-					IPPGeoLocation geo_location = new IPPGeoLocation();
-					if(mNowLocation != null){
-						geo_location.setLongitude(mNowLocation.getLongitude());
-						geo_location.setLatitude(mNowLocation.getLatitude());
-						geo_location.setAccuracy(mNowLocation.getAccuracy());
-						geo_location.setTimestamp(mNowLocation.getTime());
+				//スクリーンネーム
+				commentItem.setCommentScreenName(ipp_screen_name);
 
-						geo_location.setProvider(mNowLocation.getProvider());
-					}
+				//緯度経度精度
+				/*
+				if(mNowLocation != null){
+					commentItem.setLongitude(mNowLocation.getLongitude());
+					commentItem.setLatitude(mNowLocation.getLatitude());
+					commentItem.setAccuracy(mNowLocation.getAccuracy());
+					commentItem.setProvider(mNowLocation.getProvider());
+				}
+				*/
 
+				//チームid
+				commentItem.setTeam_resource_id(team_resource_id);
+				commentItem.setPair_common_id(CommentFragment.this.pair_common_id);
 
-					//testdata
-					//geo_location.setLongitude(141.157322);
-					//geo_location.setLatitude(43.143333);
-
-
-
-					List<IPPGeoLocation> geoLocations = new ArrayList();
-					geoLocations.add(geo_location) ;
-
-					CommentGeoResource resource= new CommentGeoResource();
-					resource.setResource(commentItem);
-					resource.setGeolocations(geoLocations);
-
-					IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
-					client.setAuthKey(ipp_auth_key);
-					client.setDebugMessage(true);
-					client.create(CommentGeoResource.class, resource, new SendCommentCallback());
-
-
-
-
+				//返信
+				if(comment_parent_id_new != null){
+					commentItem.setCommentParentResourceId(comment_parent_id_new);
 				}
 
 
-			}
 
-		});
+
+				//位置情報用リソース
+				IPPGeoLocation geo_location = new IPPGeoLocation();
+				if(mNowLocation != null){
+					geo_location.setLongitude(mNowLocation.getLongitude());
+					geo_location.setLatitude(mNowLocation.getLatitude());
+					geo_location.setAccuracy(mNowLocation.getAccuracy());
+					geo_location.setTimestamp(mNowLocation.getTime());
+
+					geo_location.setProvider(mNowLocation.getProvider());
+				}
+
+
+				//testdata
+				//geo_location.setLongitude(141.157322);
+				//geo_location.setLatitude(43.143333);
+
+
+
+				List<IPPGeoLocation> geoLocations = new ArrayList();
+				geoLocations.add(geo_location) ;
+
+				CommentGeoResource resource= new CommentGeoResource();
+				resource.setResource(commentItem);
+				resource.setGeolocations(geoLocations);
+
+				IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
+				client.setAuthKey(ipp_auth_key);
+				client.setDebugMessage(true);
+				client.create(CommentGeoResource.class, resource, new SendCommentCallback());
+
+
+		}
+
 	}
 
 	//コメント送信後のコールバック
