@@ -3,10 +3,10 @@ package com.example.newecosns.cohesive;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import jp.innovationplus.ipp.client.IPPGeoResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
@@ -157,6 +157,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private int radiusSquare = 5000;//単位メートル?
 
 
+	//ログインチェック用のラッチ
+	private CountDownLatch loginChecked;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -182,12 +185,22 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		calendar = Calendar.getInstance();
 
-		adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
+
 
 		//IPPログインチェック
+
+		loginChecked = new CountDownLatch(1);
 		ippLoginCheck();
 
+		try {
+			loginChecked.await(); //ログインが終わるまで待つ
+			adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
 
+		} catch (InterruptedException e1) {
+
+			Log.d(TAG,e1.toString());
+		}
+		//アダプタのインスタンス作成時にteam_resource_idがないと困る
 
 
 	     //位置情報が利用できるか否かをチェック
@@ -259,7 +272,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
 	      if (this.ipp_auth_key.equals(""))
 	        startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
-	      return;
+
 	    }
 	    catch (JsonParseException localJsonParseException)
 	    {
@@ -276,6 +289,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	      while (true)
 	        Log.d(this.TAG, localIOException.toString());
 	    }
+
+	    loginChecked.countDown(); //ログイン終了を見てるラッチ
+	    return;
 	}
 
 
@@ -424,17 +440,21 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 					//位置情報用リソース
 					IPPGeoLocation geo_location = new IPPGeoLocation();
-					geo_location.setLongitude(mNowLocation.getLongitude());
-					geo_location.setLatitude(mNowLocation.getLatitude());
+					if(mNowLocation != null){
+						geo_location.setLongitude(mNowLocation.getLongitude());
+						geo_location.setLatitude(mNowLocation.getLatitude());
+						geo_location.setAccuracy(mNowLocation.getAccuracy());
+						geo_location.setTimestamp(mNowLocation.getTime());
+
+						geo_location.setProvider(mNowLocation.getProvider());
+
+					}
+
 
 					//testdata
 					//geo_location.setLongitude(141.157322);
 					//geo_location.setLatitude(43.143333);
 
-					geo_location.setAccuracy(mNowLocation.getAccuracy());
-					geo_location.setTimestamp(mNowLocation.getTime());
-
-					geo_location.setProvider(mNowLocation.getProvider());
 
 
 					List<IPPGeoLocation> geoLocations = new ArrayList();
@@ -509,6 +529,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 		token_secret = pref.getString("token_secret", "");
 		screen_name = pref.getString("screen_name", "");
 		user_id = pref.getLong("user_id", 0L);
+
+
 		if (token.length() == 0) { //もし未認証だったら
 			Intent intent = new Intent(getSherlockActivity(), OAuthActivity.class);
 			intent.putExtra(OAuthActivity.CALLBACK, CALLBACK);
@@ -682,6 +704,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //IPPからコメント読み込むメソッド
 	public void showCommentList(int target_year, int target_month, long until, int near) {
+
+
+
 		//オンラインなら外部DBから他人のデータ読み出し//
 		try{
 			waitBar.setVisibility(View.VISIBLE);
@@ -794,9 +819,6 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 						adapter.add(commentItem);
 					}
 
-
-
-
 					try{
 						listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
 						listView.setAdapter(adapter);
@@ -815,13 +837,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 						adapter.add(commentItem);
 					}
-
-
 				}
-
 			}
-
-
 
 			//プログレスバー隠す
 			try{
@@ -832,87 +849,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			}
 		}
 
-
-
 	}
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//コメント取得コールバック
-//TODO 使ってない？
-	public class CommentGetCallback implements IPPQueryCallback<CommentItem[]> {
-
-
-
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(CommentFragment.this.getActivity(), "コメント読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-		}
-
-		@Override
-		public void ippDidFinishLoading(CommentItem[] comment_item_array) {
-			//IPPプラットフォームから取得したコメントのリスト
-			//そのままだと配列なので、リストにする
-
-
-			if(comment_item_array.length != 0 ){
-				last_timestamp = comment_item_array[comment_item_array.length -1].getTimestamp() -1; //最後の要素のタイムスタンプを得る
-				List<CommentItem> CommentItemList = new ArrayList<CommentItem>(Arrays.asList(comment_item_array));
-				Collections.sort(CommentItemList, new PublicResourceComparatorInverse());
-
-				if(until == 0){ //初期よみこみ
-					for(CommentItem commentItem : CommentItemList){
-
-						adapter.add(commentItem);
-					}
-
-
-
-
-					try{
-						listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-						listView.setAdapter(adapter);
-						//終わったら成功のトースト出す
-						Toast toast = Toast.makeText(getSherlockActivity(), "コメント読み込み成功", Toast.LENGTH_LONG);
-						toast.show();
-
-					} catch (NullPointerException e){
-						Log.d("BACK GROUND", "writing timeline error");
-					}
-
-				}else{ //追加読み込み
-
-
-					for(CommentItem commentItem : CommentItemList){
-
-						adapter.add(commentItem);
-					}
-
-
-				}
-
-			}
-
-
-
-			//プログレスバー隠す
-			try{
-				waitBar.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
-			}catch (NullPointerException e){
-
-			}
-		}
-
-
-
-	}
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -967,41 +904,63 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				if(item.getTeam_resource_id().equals(team_resource_id)){
 					switch(role_self){
 						case Constants.KOHAI:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+							convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+							//先輩アイコン消す
+							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
+							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
+							((TextView) convertView.findViewById(R.id.CommentScreenNameInListLeft)).setText(item.getCommentScreenName());
 							break;
 						case Constants.SENPAI:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+							convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+							//後輩アイコン消す
+							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
+							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
+							((TextView) convertView.findViewById(R.id.CommentScreenNameInListRight)).setText(item.getCommentScreenName());
 							break;
+						/*
 						case Constants.RELAXED_ROLE:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+							convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
 							break;
+
+						*/
 
 					}
 				//相手側チーム(というか自分のチーム以外)のとき
 				}else{
 					switch(role_self){
 					case Constants.KOHAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+						convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+						//後輩アイコン消す
+						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
+						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
+						((TextView) convertView.findViewById(R.id.CommentScreenNameInListRight)).setText(item.getCommentScreenName());
 						break;
 					case Constants.SENPAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+						convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+						//先輩アイコン消す
+						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
+						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
+						((TextView) convertView.findViewById(R.id.CommentScreenNameInListLeft)).setText(item.getCommentScreenName());
 						break;
+					/*
 					case Constants.RELAXED_ROLE:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+						convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
 						break;
-
+					*/
 					}
 
 				}
 			}else{
-				convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
+				convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
+				//先輩アイコン消す
+				convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
 
 			}
 
 
 
 			//ビューに値をセット
-			((TextView) convertView.findViewById(R.id.CommentScreenNameInList)).setText(item.getCommentScreenName());
+
 			((TextView) convertView.findViewById(R.id.CommentTextInList)).setText(item.getCommentText());
 
 			//日付は最初からストリング yyyy-MM-dd HH:mm:ss

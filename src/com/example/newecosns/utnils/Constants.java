@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.newecosns.models.MarkItem;
 
-public class Constants {
+public class  Constants{
 
 	//role
 	public static final int SENPAI = 1;

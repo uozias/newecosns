@@ -24,8 +24,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,11 +33,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -47,18 +43,13 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.InputLogActivity;
+import com.example.newecosns.LogAdapter;
 import com.example.newecosns.MainActivity;
 import com.example.newecosns.R;
-import com.example.newecosns.models.LogAdapter;
-import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.PEBItem;
 import com.example.newecosns.models.PairItem;
-import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.ProductItem;
-import com.example.newecosns.models.SummaryAdapter;
 import com.example.newecosns.models.SummaryItem;
-import com.example.newecosns.utnils.ImageCache;
-import com.example.newecosns.utnils.NetworkManager;
 
 
 public class OthersLogFragment extends SherlockFragment {
@@ -322,187 +313,15 @@ public class OthersLogFragment extends SherlockFragment {
 
 
 
-		//showLogList(target_year, target_month, until);
+
 		showSummaryList(target_year, target_month);
 	}
 
 
-	public void showLogList(int target_year, int target_month, long until){
 
 
 
-		//オンラインなら外部DBから他人のデータ読み出し//
-		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
 
-
-			IPPApplicationResourceClient public_resource_client = new IPPApplicationResourceClient(getActivity().getApplicationContext());
-			public_resource_client.setAuthKey(ipp_auth_key);
-			QueryCondition condition = new QueryCondition();
-			condition.setCount(10);
-
-
-			//読みだすデータの日時の範囲を指定
-			int year = 0;
-			int month = 0;
-
-
-
-			if(target_month == 0 && target_year == 0){
-				//今月1日のUNIXタイムスタンプ(ミリ秒)を取得
-				year = calendar.get(Calendar.YEAR);
-				month = calendar.get(Calendar.MONTH);
-				calendar.set(year, month, 1, 0, 0, 0);
-				condition.setSince(calendar.getTimeInMillis()); //今月頭から
-				if(until != 0){
-					condition.setUntil(until);//指定した日時まで
-				}else{
-
-					condition.setUntil(System.currentTimeMillis()); //現在まで
-				}
-
-
-			}else{//月と日を指定されたら
-				year = target_year;
-				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
-				condition.setSince(calendar.getTimeInMillis());
-				if(until != 0){
-					condition.setUntil(until);//指定した日時まで
-				}else{
-					calendar.add(Calendar.MONTH, 1);
-					condition.setUntil(calendar.getTimeInMillis()); //次の月の1日まで
-					 calendar.add(Calendar.MONTH, -1); //戻しとく
-				}
-
-			}
-
-			condition.build();
-
-			if(until == 0){
-
-				public_resource_client.query(LogItem.class,condition, new LogGetCallback()); //最初のよみこみ
-
-			}else{
-
-				public_resource_client.query(LogItem.class, condition,new AdditionalLogGetCallback()); //追加読み込み
-			}
-
-		}
-
-
-	}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//IPPプラットフォーム上からログをを読み込むコールバック
-	private class LogGetCallback implements IPPQueryCallback <LogItem[]>{
-
-
-
-		@Override
-		public void ippDidFinishLoading(LogItem[] log_item_array) {
-
-
-			List<LogItem> LogItemList = new ArrayList<LogItem>();
-
-
-			LogItem item = null;
-			for ( int i = 0; i < log_item_array.length; ++i ) {
-
-				item  =	log_item_array[i];
-				LogItemList.add(item);
-			}
-			if(item != null){
-				last_timestamp = item.getTimestamp();
-			}
-
-
-
-			ListView listView = (ListView) OthersLogFragment.this.getActivity().findViewById(R.id.log_list);//自分で用意したListView
-
-			adapter = new LogAdapter(OthersLogFragment.this.getActivity(), LogItemList, R.layout.row_log, new PictureGetCallback(), ipp_auth_key);
-			try{
-				listView.setAdapter(adapter);
-			}catch( NullPointerException e){
-				Log.d(TAG, "ログ読み込みエラー");
-			}
-
-			//プログレスバー隠す
-			try{
-				wait_bar.setVisibility(View.GONE);
-			}catch (NullPointerException e){
-
-			}
-
-		}
-
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(OthersLogFragment.this.getActivity(), "家計簿読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-
-		}
-
-
-
-
-	}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//IPPプラットフォーム上から追加でログを読み込むコールバック
-
-	private class AdditionalLogGetCallback implements IPPQueryCallback <LogItem[]>{
-
-		@Override
-		public void ippDidFinishLoading(LogItem[] log_item_array) {
-
-			for ( int i = 0; i < log_item_array.length; ++i ) {
-				LogItem item = new LogItem();
-				item  =	log_item_array[i];
-				adapter.add(item);
-			}
-
-			wait_bar.setVisibility(View.GONE);
-		}
-
-		@Override
-		public void ippDidError(int paramInt) {
-			Toast.makeText(OthersLogFragment.this.getActivity(), "家計簿読み込みエラー"+paramInt, Toast.LENGTH_LONG).show();
-
-		}
-
-
-	}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//画像を読み込むコールバック(キャッシュ対応)
-	private class PictureGetCallback implements IPPQueryCallback<PictureItem>{
-
-		@Override
-		public void ippDidError(int arg0) {
-			Log.d(TAG,"画像読み込み失敗");
-		}
-
-		@Override
-		public void ippDidFinishLoading(PictureItem pictureItem) {
-
-			ImageView imageView = adapter.getPictureViewList().get(pictureItem.getResource_id());
-			ProgressBar picture_wait_bar = adapter.getProgressBarList().get(pictureItem.getResource_id());
-
-			if(pictureItem.getData() != null && imageView != null){
-				Bitmap bitmap = BitmapFactory.decodeByteArray(pictureItem.getData(), 0, pictureItem.getData().length);
-				imageView.setImageBitmap(bitmap);
-				ImageCache.setImage(pictureItem.getResource_id(), bitmap);//キャッシュ
-
-				imageView.setVisibility(View.VISIBLE);
-				picture_wait_bar.setVisibility(View.GONE);
-			}
-
-
-
-		}
-
-	}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//まとめの表示

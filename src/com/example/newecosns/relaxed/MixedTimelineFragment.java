@@ -810,7 +810,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 			}
 
 
-			public_resource_client.query(CommentGeoResource.class, condition, new CommentGetCallback(mUntil)); //最初
+			public_resource_client.query(CommentGeoResource.class, condition, new CommentGetCallback(mUntil, near)); //最初
 
 
 
@@ -826,9 +826,11 @@ class geoPostCallback implements IPPQueryCallback<String> {
 	public class CommentGetCallback implements IPPQueryCallback<CommentGeoResource[]> {
 
 		private long mUntil = 0;
+		private int near = 0;
 
-		public CommentGetCallback(long until){
-			mUntil = until;
+		public CommentGetCallback(long until, int near){
+			this.mUntil = until;
+			this.near = near;
 
 		}
 
@@ -875,7 +877,7 @@ class geoPostCallback implements IPPQueryCallback<String> {
 			condition.eq("pair_common_id",pair_common_id);
 			condition.build();
 
-			if(near == 1){
+			if(this.near == 1){
 				condition.setBoundByRadiusSquare(mNowLocation.getLatitude(), mNowLocation.getLongitude(), radiusSquare);
 			}
 

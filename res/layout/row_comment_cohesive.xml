@@ -1,135 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
     <LinearLayout
-        android:id="@+id/wrapper_comment_content"
-        android:layout_width="match_parent"
+        android:id="@+id/imagesWrapperLeft"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/CommentScreenNameInList"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/imageViewLeft"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_ichou" />
+
+        <TextView
+            android:id="@+id/CommentScreenNameInListLeft"
+             android:layout_height="wrap_content"
+           android:layout_width="match_parent"
+ 			android:layout_gravity="center"
+
             android:textColor="@color/black"
             android:textSize="14sp" >
         </TextView>
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/CommentTextInList"
+    <LinearLayout
+        android:id="@+id/wrapper_comment_fuki"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/imagesWrapperRight"
+        android:layout_toRightOf="@+id/imagesWrapperLeft"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/wrapper_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:textColor="@color/black"
-            android:textSize="14sp" >
-        </TextView>
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/CommentCreatedInList"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:textColor="@color/black"
-            android:textSize="14sp" >
-        </TextView>
+            <TextView
+                android:id="@+id/CommentTextInList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/CommentCreatedInList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="14sp" >
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="5dp"
+                    android:src="@android:drawable/star_on" />
+
+                <TextView
+                    android:id="@+id/label_of_number_of_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/label_of_number_of_star"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/number_of_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" >
+                </TextView>
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:gravity="right"
             android:orientation="horizontal" >
 
-            <ImageView
+            <Button
+                android:id="@+id/replyBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_marginLeft="5dp"
-                android:src="@android:drawable/star_on" />
+                android:text="@string/reply_to_comment"
+                android:textSize="28sp"
+                android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/label_of_number_of_star"
+            <Button
+                android:id="@+id/showConversation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
-                android:text="@string/label_of_number_of_star"
-                android:textColor="@color/black"
-                android:textSize="14sp" >
-            </TextView>
-
-            <TextView
-                android:id="@+id/number_of_star"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
-
-                android:textColor="@color/black"
-                android:textSize="14sp" >
-            </TextView>
+                android:text="@string/showConversation"
+                android:textSize="28sp"
+                android:visibility="gone" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:orientation="horizontal" >
-
         <Button
-            android:id="@+id/replyBtn"
+            android:id="@+id/buton_evaluate_it"
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reply_to_comment"
-            android:textSize="28sp"
-            android:visibility="visible" />
+            android:layout_gravity="right"
+            android:drawableLeft="@android:drawable/star_big_on"
+            android:text="@string/buton_evaluate_it"
+            android:textSize="28sp" />
 
-        <Button
-            android:id="@+id/showConversation"
-            android:layout_width="wrap_content"
+        <!-- 隠し要素 -->
+
+        <TextView
+            android:id="@+id/CommentParentResourceIdInList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/showConversation"
-            android:textSize="28sp"
+            android:gravity="center_horizontal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/CommentResourceIdInList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:visibility="gone" />
     </LinearLayout>
 
- 	     <Button
-	         android:id="@+id/buton_evaluate_it"
-	         style="?android:attr/buttonStyleSmall"
-	         android:layout_width="wrap_content"
-	         android:layout_height="wrap_content"
-	         android:text="@string/buton_evaluate_it"
-	         android:layout_gravity="right"
-	         android:textSize="28sp"
-	          android:drawableLeft="@android:drawable/star_big_on"
-	        />
-
-
-    <!-- 隠し要素 -->
-
-    <TextView
-        android:id="@+id/CommentParentResourceIdInList"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/imagesWrapperRight"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:visibility="gone" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/CommentResourceIdInList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:visibility="gone" />
+        <ImageView
+            android:id="@+id/imageViewRight"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_ichou" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/CommentScreenNameInListRight"
+             android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
+    </LinearLayout>
+
+</RelativeLayout>

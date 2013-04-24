@@ -71,7 +71,7 @@
     <string name="password_label">パスワード</string>
     <string name="user_name_label">ユーザ名</string>
     <string name="screen_name_label">ニックネーム</string>
-    <string name="login_label">ログイン</string>
+    <string name="login_label">再ログイン</string>
     <string name="login_instruction">ログインして下さい</string>
     <string name="url_ipp_login">http://133.242.42.29:8080/IPP_UserWebConsole/login </string>
     <string name="login_instruction_bottom">はじめて利用する時は下のボタンを押してアプリ設定をして下さい。詳しくはマニュアルを御覧ください。</string>

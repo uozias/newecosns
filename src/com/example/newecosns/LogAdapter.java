@@ -1,4 +1,4 @@
-package com.example.newecosns.models;
+package com.example.newecosns;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -18,6 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.newecosns.R;
+import com.example.newecosns.models.LogItem;
+import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.utnils.ImageCache;
 
 public class LogAdapter extends ArrayAdapter<LogItem> {

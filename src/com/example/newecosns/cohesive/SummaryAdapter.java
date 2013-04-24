@@ -1,4 +1,4 @@
-package com.example.newecosns.models;
+package com.example.newecosns.cohesive;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.newecosns.R;
+import com.example.newecosns.models.SummaryItem;
 import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.StarCallback;
 
