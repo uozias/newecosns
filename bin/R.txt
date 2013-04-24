@@ -386,7 +386,7 @@ int id button_log_purchase 0x7f050036
 int id button_outdoor 0x7f050037
 int id check_tweet 0x7f050050
 int id co2PEB 0x7f05009f
-int id co2_in_summary 0x7f0500af
+int id co2_in_summary 0x7f0500ae
 int id comment_list 0x7f050064
 int id container 0x7f05005b
 int id detail_in_peb 0x7f05009e
@@ -422,7 +422,7 @@ int id listMode 0x7f050002
 int id log_list 0x7f050071
 int id log_timeline 0x7f050070
 int id markProduct 0x7f0500a7
-int id monery_in_summary 0x7f0500b0
+int id monery_in_summary 0x7f0500af
 int id moneyPEB 0x7f0500a0
 int id month_in_summary_fragment 0x7f0500ab
 int id month_label_in_summary_fragment 0x7f0500ac
@@ -436,7 +436,7 @@ int id offline_log 0x7f05004f
 int id pictureImageView 0x7f050052
 int id pictureInList 0x7f050094
 int id previous_month 0x7f050061
-int id price_in_summary 0x7f0500b1
+int id price_in_summary 0x7f0500b0
 int id producerProduct 0x7f0500a5
 int id producer_in_product 0x7f0500a4
 int id product_peb_name 0x7f050041
@@ -445,7 +445,7 @@ int id product_selected_name 0x7f050044
 int id product_selected_price 0x7f05004a
 int id product_selected_producer 0x7f050047
 int id radiogroup 0x7f050034
-int id rank_in_summary 0x7f0500ae
+int id rank_in_summary 0x7f0500b1
 int id replies_list 0x7f05005c
 int id replyBtn 0x7f05007f
 int id reply_for 0x7f050066

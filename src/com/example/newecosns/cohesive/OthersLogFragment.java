@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -53,6 +54,7 @@ import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.ProductItem;
 import com.example.newecosns.models.SummaryItem;
 import com.example.newecosns.utnils.NetworkManager;
+import com.example.newecosns.utnils.SummaryItemRankComparator;
 
 
 public class OthersLogFragment extends SherlockFragment {
@@ -422,8 +424,13 @@ public class OthersLogFragment extends SherlockFragment {
 
 			//配列をリストに変換
 			List<SummaryItem> summary_item_list = new ArrayList<SummaryItem>(Arrays.asList(summary_item_array));
-			for (SummaryItem summaryItem:summary_item_list){
-				summary_adapter.add(summaryItem);;
+			//ランク順に並べ替え
+			Collections.sort(summary_item_list, new SummaryItemRankComparator());
+
+			for (int i = 0; i < summary_item_list.size(); i++){
+				SummaryItem summaryItem = summary_item_list.get(i);
+				summaryItem.setRank_of_number(i+1) ; //順位を追加
+				summary_adapter.add(summaryItem);
 
 			}
 

@@ -35,7 +35,7 @@
     <string name="stress_change">ストレス切替</string>
     <string name="only_me">自分のだけ表示</string>
     <string name="all_users">全体表示</string>
-    <string name="ipp_login">ログイン</string>
+    <string name="ipp_login">再ログイン</string>
     <string name="others_summary">他の人の家計簿</string>
     <string name="my_summary">あなたの家計簿</string>
     <string name="check_tweet">ツイッターに投稿</string>
@@ -65,13 +65,13 @@
     <string name="screen_name_label_in_summary_fragment">さんの</string>
     <string name="summary_number_label_after">回実行</string>
     <string name="summary_number_label">今月エコ行動を</string>
-    <string name="summary_rank_label">ユーザ中</string>
+    <string name="summary_rank_label">グループで</string>
     <string name="summary_rank_label_after">位</string>
     <string name="month_label_in_summary_fragment">月のまとめ</string>
     <string name="password_label">パスワード</string>
     <string name="user_name_label">ユーザ名</string>
     <string name="screen_name_label">ニックネーム</string>
-    <string name="login_label">再ログイン</string>
+    <string name="login_label">ログイン</string>
     <string name="login_instruction">ログインして下さい</string>
     <string name="url_ipp_login">http://133.242.42.29:8080/IPP_UserWebConsole/login </string>
     <string name="login_instruction_bottom">はじめて利用する時は下のボタンを押してアプリ設定をして下さい。詳しくはマニュアルを御覧ください。</string>

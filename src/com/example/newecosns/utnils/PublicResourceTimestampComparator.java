@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import jp.innovationplus.ipp.jsontype.IPPApplicationResource;
 
-public class PublicResourceComparator
+public class PublicResourceTimestampComparator
   implements Comparator<IPPApplicationResource>
 {
   int result = 0;

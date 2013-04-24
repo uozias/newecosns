@@ -131,11 +131,6 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 
 
 
-
-
-
-
-
 		Calendar calendar_now = Calendar.getInstance();
 		calendar_now.setTimeInMillis(item.getTimestamp()); //今の日時
 
@@ -144,8 +139,9 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 
 		((TextView)convertView.findViewById(R.id.number_in_summary)).setText(String.valueOf(item.getNumber()));
 
-		//((TextView)convertView.findViewById(R.id.rank_in_summary)).setText(String.valueOf(item.getRank_of_number()));
-		((TextView)convertView.findViewById(R.id.rank_in_summary)).setVisibility(View.GONE);
+
+		((TextView)convertView.findViewById(R.id.rank_in_summary)).setText(String.valueOf(item.getRank_of_number()));
+
 
 		NumberFormat nf = NumberFormat.getNumberInstance();
 		nf.setMaximumFractionDigits(2);

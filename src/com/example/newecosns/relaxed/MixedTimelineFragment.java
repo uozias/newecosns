@@ -75,7 +75,7 @@ import com.example.newecosns.models.PictureItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.ImageCache;
 import com.example.newecosns.utnils.NetworkManager;
-import com.example.newecosns.utnils.PublicResourceComparator;
+import com.example.newecosns.utnils.PublicResourceTimestampComparator;
 public class MixedTimelineFragment extends SherlockFragment implements  LocationListener  {
 //public class MixedTimelineFragment extends SherlockFragment implements LoaderCallbacks<Status>, LocationListener  {
 	static final String CALLBACK = "http://sns.uozias.jp";
@@ -917,7 +917,7 @@ public class MixedTimelineFragment extends SherlockFragment implements  Location
 			}
 
 
-			Collections.sort(IPPPublicResourceListTmp, new PublicResourceComparator());
+			Collections.sort(IPPPublicResourceListTmp, new PublicResourceTimestampComparator());
 			for(IPPApplicationResource resource: IPPPublicResourceListTmp){
 				adapter.add(resource);
 			}

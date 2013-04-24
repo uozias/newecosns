@@ -1071,7 +1071,7 @@ containing a value of this type.
         public static final int button_outdoor=0x7f050037;
         public static final int check_tweet=0x7f050050;
         public static final int co2PEB=0x7f05009f;
-        public static final int co2_in_summary=0x7f0500af;
+        public static final int co2_in_summary=0x7f0500ae;
         public static final int comment_list=0x7f050064;
         public static final int container=0x7f05005b;
         public static final int detail_in_peb=0x7f05009e;
@@ -1107,7 +1107,7 @@ containing a value of this type.
         public static final int log_list=0x7f050071;
         public static final int log_timeline=0x7f050070;
         public static final int markProduct=0x7f0500a7;
-        public static final int monery_in_summary=0x7f0500b0;
+        public static final int monery_in_summary=0x7f0500af;
         public static final int moneyPEB=0x7f0500a0;
         public static final int month_in_summary_fragment=0x7f0500ab;
         public static final int month_label_in_summary_fragment=0x7f0500ac;
@@ -1121,7 +1121,7 @@ containing a value of this type.
         public static final int pictureImageView=0x7f050052;
         public static final int pictureInList=0x7f050094;
         public static final int previous_month=0x7f050061;
-        public static final int price_in_summary=0x7f0500b1;
+        public static final int price_in_summary=0x7f0500b0;
         public static final int producerProduct=0x7f0500a5;
         public static final int producer_in_product=0x7f0500a4;
         public static final int product_peb_name=0x7f050041;
@@ -1130,7 +1130,7 @@ containing a value of this type.
         public static final int product_selected_price=0x7f05004a;
         public static final int product_selected_producer=0x7f050047;
         public static final int radiogroup=0x7f050034;
-        public static final int rank_in_summary=0x7f0500ae;
+        public static final int rank_in_summary=0x7f0500b1;
         public static final int replies_list=0x7f05005c;
         public static final int replyBtn=0x7f05007f;
         public static final int reply_for=0x7f050066;

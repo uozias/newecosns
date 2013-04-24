@@ -64,7 +64,7 @@ import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.NetworkManager;
-import com.example.newecosns.utnils.PublicResourceComparatorInverse;
+import com.example.newecosns.utnils.PublicResourceTimestampComparatorInverse;
 import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
@@ -797,7 +797,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					CommentItemList.add(comment_geo_item_array[i].getResource());
 				}
 
-				Collections.sort(CommentItemList, new PublicResourceComparatorInverse());
+				Collections.sort(CommentItemList, new PublicResourceTimestampComparatorInverse());
 
 				if(until == 0){ //初期よみこみ
 					for(CommentItem commentItem : CommentItemList){
