@@ -35,6 +35,8 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 	private Button buton_evaluate_it = null;
 	private Fragment fragment;
 
+	private View selected_elemenbt = null;
+
 	public CommentAdapter(Context context, List<CommentItem> comments) {
 		super(context, 0, comments);
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -245,7 +247,7 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 			CharSequence resource_id = ((TextView) list_element.findViewById(R.id.CommentResourceIdInList)).getText();
 
 			//一度全要素を未選択に
-			ViewGroup listView = (ViewGroup) list_element.getParent();
+			ViewGroup listView = (ViewGroup) list_element.getParent().getParent().getParent();
 			for (int i = 0; i < listView.getChildCount() ; i++){
 				listView.getChildAt(i).setSelected(false);
 			}
@@ -253,6 +255,10 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 			//今入力しているコメントの返信先を選択中のコメントに設定
 			comment_parent_id_new.setText(resource_id);
 			list_element.setSelected(true);
+			selected_elemenbt = list_element;
+
+			//TODO 返信用ダイアログ
+
 		}
 
 

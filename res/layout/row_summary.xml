@@ -294,7 +294,7 @@
             android:src="@drawable/ic_ichou" />
 
         <TextView
-            android:id="@+id/CommentScreenNameInListRight"
+            android:id="@+id/ScreenNameInListRight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

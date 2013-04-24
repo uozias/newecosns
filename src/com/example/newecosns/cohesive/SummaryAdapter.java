@@ -72,13 +72,20 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 				if(item.getTeam_resource_id().equals(team_resource_id)){
 					switch(role_self){
 						case Constants.KOHAI:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+							convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
+							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
+							((TextView) convertView.findViewById(R.id.ScreenNameInListLeft)).setText(item.getScreen_name());
+
 							break;
 						case Constants.SENPAI:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+							convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
+							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
+							((TextView) convertView.findViewById(R.id.ScreenNameInListRight)).setText(item.getScreen_name());
 							break;
 						case Constants.RELAXED_ROLE:
-							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
+							convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
 							break;
 
 					}
@@ -88,13 +95,25 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 				}else{
 					switch(role_self){
 					case Constants.KOHAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+						convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+						//後輩アイコン消す
+						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
+						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
+						((TextView) convertView.findViewById(R.id.ScreenNameInListRight)).setText(item.getScreen_name());
+
+
 						break;
 					case Constants.SENPAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+						convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+						//先輩アイコン消す
+						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
+						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
+						((TextView) convertView.findViewById(R.id.ScreenNameInListLeft)).setText(item.getScreen_name());
+
+
 						break;
 					case Constants.RELAXED_ROLE:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
+						convertView.findViewById(R.id.wrapper_summary_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
 						break;
 
 					}

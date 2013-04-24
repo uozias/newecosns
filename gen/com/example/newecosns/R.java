@@ -1016,6 +1016,7 @@ containing a value of this type.
         public static final int ProgressBarInList=0x7f050095;
         public static final int ProgressBarInPEBList=0x7f050039;
         public static final int ScreenNameInListLeft=0x7f0500a9;
+        public static final int ScreenNameInListRight=0x7f0500b3;
         public static final int ScrollViewInputLog=0x7f05003a;
         public static final int abs__action_bar=0x7f050022;
         public static final int abs__action_bar_container=0x7f050021;
@@ -1058,7 +1059,7 @@ containing a value of this type.
         public static final int abs__titleDivider=0x7f05001c;
         public static final int abs__up=0x7f05000b;
         public static final int action_dialog_peb_id=0x7f050074;
-        public static final int action_settings=0x7f0500b3;
+        public static final int action_settings=0x7f0500b4;
         public static final int backToCommentFragment=0x7f05005d;
         public static final int bottom_control_bar=0x7f05006a;
         public static final int buton_evaluate_it=0x7f050081;
