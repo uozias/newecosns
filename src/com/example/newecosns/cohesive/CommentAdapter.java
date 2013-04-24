@@ -36,11 +36,19 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 	private Fragment fragment;
 
 	private View selected_elemenbt = null;
+	private int replyActivityFlg;
 
 	public CommentAdapter(Context context, List<CommentItem> comments) {
 		super(context, 0, comments);
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.context = context;
+
+	}
+
+	public CommentAdapter(Context context, List<CommentItem> comments,  String team_resource_id, int role_self, String ipp_auth_key, int replyActivityFlg) {
+		this(context, comments,team_resource_id, role_self, ipp_auth_key);
+		this.replyActivityFlg= replyActivityFlg;
+
 
 	}
 
@@ -50,8 +58,7 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 		this.context = context;
 		this.team_resource_id  = team_resource_id;
 		this.role_self = role_self;
-
-
+		this.ipp_auth_key = ipp_auth_key;
 
 	}
 
@@ -155,16 +162,14 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 
 
 		//返信先表示
+
+
 		showConversationBtn = (Button) convertView.findViewById(R.id.showConversation);
-		if (parentresourceid.getText().length() != 0){
+		if (parentresourceid.getText().length() != 0 && replyActivityFlg == 0){
 
 			showConversationBtn.setVisibility(View.VISIBLE);
 
-			showConversationBtn.setOnClickListener(new GetConversationListener(item));
-
-
-
-
+			showConversationBtn.setOnClickListener(new GetConversationListener(item, context));
 
 
 		}else{//会話を表示」メニュー
@@ -179,7 +184,14 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 		//返信ボタンをタップしたら
 		replyBtn = (Button) convertView.findViewById(R.id.replyBtn);
 
-		replyBtn.setOnClickListener(new setReplyTarget(item));
+		if(replyActivityFlg == 1){
+
+			replyBtn.setVisibility(View.GONE);
+		}else{
+			replyBtn.setOnClickListener(new setReplyTarget(item));
+
+		}
+
 
 
 
@@ -206,8 +218,9 @@ public class CommentAdapter extends ArrayAdapter<CommentItem> {
 
 
 
-		public GetConversationListener (CommentItem item){
+		public GetConversationListener (CommentItem item, Context context){
 			this.item = item;
+			this.context = context;
 
 
 

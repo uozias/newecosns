@@ -1,6 +1,8 @@
 package com.example.newecosns.cohesive;
 
 
+import java.util.ArrayList;
+
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
 import android.app.Activity;
@@ -10,22 +12,16 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.R;
 import com.example.newecosns.models.CommentItem;
-import com.example.newecosns.models.StressItem;
-import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 
 public class RepliesActivity extends Activity {
@@ -105,7 +101,7 @@ public class RepliesActivity extends Activity {
 		//リストビューの準備
 		ListView listView = (ListView) RepliesActivity.this.findViewById(R.id.replies_list);//自分で用意したListView
 		listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-		adapter = new CommentAdapter(RepliesActivity.this.getApplicationContext(), stress_now, ipp_id_string);
+		adapter = new CommentAdapter(RepliesActivity.this, new ArrayList<CommentItem>(), team_resource_id, role_self, ipp_auth_key, 1);
 		listView.setAdapter(adapter);
 
 		//ippサーバから全やり取りのデータをとってくるメソッド
@@ -188,6 +184,8 @@ public class RepliesActivity extends Activity {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //コメント表示用アダプター(密-ゆるい切替機能付き)
+/*
+
 	class CommentAdapter extends ArrayAdapter<CommentItem> {
 	private LayoutInflater mInflater;
 	private String stress_now;
@@ -290,5 +288,7 @@ public class RepliesActivity extends Activity {
 		}
 
 	}
+
+	*/
 
 }
