@@ -2,11 +2,14 @@ package com.example.newecosns;
 
 
 
+import java.util.concurrent.CountDownLatch;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.WindowManager.LayoutParams;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -68,6 +71,9 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	ActionBar actionBar;
 
+	//ログインチェック用のラッチ
+		private CountDownLatch loginChecked;
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,12 +103,21 @@ public class MainActivity extends SherlockFragmentActivity {
 	}
 
 
+	/*
 	@Override
 	public void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 
 
 
+
+	}
+	*/
+
+	//再開時
+	@Override
+	public void onRestart(){
+		super.onRestart();
 
 	}
 
@@ -112,7 +127,19 @@ public class MainActivity extends SherlockFragmentActivity {
 
 
 		//ログインチェク
+		loginChecked = new CountDownLatch(1);
 		loginCheck();
+
+		try {
+			loginChecked.await(); //ログインが終わるまで待つ
+
+			setBar();
+
+		} catch (InterruptedException e1) {
+
+			Log.d(TAG,e1.toString());
+		}
+		//バーの表示
 
 
 	}
@@ -204,12 +231,15 @@ public class MainActivity extends SherlockFragmentActivity {
 				Intent intent = new Intent(this, IPPLoginActivity.class);
 				startActivityForResult(intent, REQUEST_IPP_LOGIN);
 
-			}else{
-				setBar();
-
 			}
 
+
+
+
 		}
+
+		loginChecked.countDown(); //ログイン終了を見てるラッチ
+	    return;
 
 
 
@@ -227,46 +257,46 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void run() {
 				actionBar = getSupportActionBar();
-				actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-				actionBar.removeAllTabs();
-				if(stress_now.equals(StressItem.COHESIVE)){
-					actionBar.addTab(actionBar.newTab()
-							.setText(R.string.tab_comment_cohesive)
-							.setIcon(android.R.drawable.ic_menu_crop)
-							.setTabListener(new TabListener<CommentFragment>(
-									MainActivity.this, "commentFragment", CommentFragment.class))
-							);
-					actionBar.addTab(actionBar.newTab()
-							.setText(R.string.tab_others_cohesive)
-							.setIcon(android.R.drawable.ic_menu_edit)
-							.setTabListener(new TabListener<OthersLogFragment>(
-									MainActivity.this, "othersLogFragment", OthersLogFragment.class)));
-					actionBar.addTab(actionBar.newTab()
-							.setText(R.string.tab_summary_relaxed)
-							.setIcon(android.R.drawable.ic_menu_edit)
-							.setTabListener(new TabListener<SummaryFragment>(
-									MainActivity.this, "summaryFragment", SummaryFragment.class))
-							);
+				if (actionBar.getTabCount() == 0){
+					actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-				}else if(stress_now.equals(StressItem.RELAXED)){
-					actionBar.addTab(actionBar.newTab()
-							.setText(R.string.tab_mixed_relaxed)
-							.setIcon(android.R.drawable.ic_menu_crop)
-							.setTabListener(new TabListener<MixedTimelineFragment>(
-									MainActivity.this, "mixedTimelineFragment", MixedTimelineFragment.class))
-							);
-					actionBar.addTab(actionBar.newTab()
-							.setText(R.string.tab_summary_relaxed)
-							.setIcon(android.R.drawable.ic_menu_edit)
-							.setTabListener(new TabListener<SummaryFragment>(
-									MainActivity.this, "summaryFragment", SummaryFragment.class))
-							);
+					if(stress_now.equals(StressItem.COHESIVE)){
+						actionBar.addTab(actionBar.newTab()
+								.setText(R.string.tab_comment_cohesive)
+								.setIcon(android.R.drawable.ic_menu_crop)
+								.setTabListener(new TabListener<CommentFragment>(
+										MainActivity.this, "commentFragment", CommentFragment.class))
+								);
+						actionBar.addTab(actionBar.newTab()
+								.setText(R.string.tab_others_cohesive)
+								.setIcon(android.R.drawable.ic_menu_edit)
+								.setTabListener(new TabListener<OthersLogFragment>(
+										MainActivity.this, "othersLogFragment", OthersLogFragment.class)));
+						actionBar.addTab(actionBar.newTab()
+								.setText(R.string.tab_summary_relaxed)
+								.setIcon(android.R.drawable.ic_menu_edit)
+								.setTabListener(new TabListener<SummaryFragment>(
+										MainActivity.this, "summaryFragment", SummaryFragment.class))
+								);
 
+					}else if(stress_now.equals(StressItem.RELAXED)){
+						actionBar.addTab(actionBar.newTab()
+								.setText(R.string.tab_mixed_relaxed)
+								.setIcon(android.R.drawable.ic_menu_crop)
+								.setTabListener(new TabListener<MixedTimelineFragment>(
+										MainActivity.this, "mixedTimelineFragment", MixedTimelineFragment.class))
+								);
+						actionBar.addTab(actionBar.newTab()
+								.setText(R.string.tab_summary_relaxed)
+								.setIcon(android.R.drawable.ic_menu_edit)
+								.setTabListener(new TabListener<SummaryFragment>(
+										MainActivity.this, "summaryFragment", SummaryFragment.class))
+								);
+
+
+					}
 
 				}
-
-				//右はじのタブ(個人家計簿)表示
-				//actionBar.getTabAt(1).select();
 
 			}
 		});

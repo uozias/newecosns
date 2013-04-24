@@ -64,6 +64,7 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 			convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary));
 			//自分のサマリーだけを表示するとき
 
+
 		}else{
 
 			//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
@@ -139,8 +140,12 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 
 		((TextView)convertView.findViewById(R.id.number_in_summary)).setText(String.valueOf(item.getNumber()));
 
+		if(flg_self_only == 1){
+			((TextView)convertView.findViewById(R.id.rank_in_summary)).setVisibility(View.GONE);
+		}else{
+			((TextView)convertView.findViewById(R.id.rank_in_summary)).setText(String.valueOf(item.getRank_of_number()));
+		}
 
-		((TextView)convertView.findViewById(R.id.rank_in_summary)).setText(String.valueOf(item.getRank_of_number()));
 
 
 		NumberFormat nf = NumberFormat.getNumberInstance();
