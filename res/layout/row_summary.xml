@@ -1,231 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_row_summary"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/imagesWrapperLeft"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" >
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/imageViewLeft"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_ichou" />
 
         <TextView
-            android:id="@+id/screen_name_in_summary_fragment"
-            android:layout_width="wrap_content"
+            android:id="@+id/ScreenNameInListLeft"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:gravity="center_horizontal" />
-
-        <TextView
-            android:id="@+id/screen_name_label_in_summary_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:textColor="@color/black"
-            android:gravity="center_horizontal"
-            android:text="@string/screen_name_label_in_summary_fragment" />
-          <TextView
-            android:id="@+id/month_in_summary_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textColor="@color/white"
-             />
-
-           <TextView
-            android:id="@+id/month_label_in_summary_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textColor="@color/black"
-            android:text="@string/month_label_in_summary_fragment" />
+            android:textSize="14sp" >
+        </TextView>
     </LinearLayout>
 
     <LinearLayout
-
+        android:id="@+id/wrapper_summary_fuki"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" >
+        android:layout_toLeftOf="@+id/imagesWrapperRight"
+        android:layout_toRightOf="@+id/imagesWrapperLeft"
+        android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:text="@string/summary_number_label"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:gravity="center"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/number_in_summary"
-            android:layout_width="wrap_content"
+
+
+            <TextView
+                android:id="@+id/month_in_summary_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="18sp"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/month_label_in_summary_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/month_label_in_summary_fragment"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
+            android:gravity="center"
+            android:orientation="horizontal" >
 
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="@string/summary_number_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/number_in_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:text="@string/summary_number_label_after"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <!-- 今は取りあえず見えなくしとく -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="6dp"
-            android:text="@string/summary_number_label_after"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-   </LinearLayout>
-   <!-- 今は取りあえず見えなくしとく  -->
-            <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone" >
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="@string/summary_rank_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/rank_in_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:text="@string/summary_rank_label_after"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:text="@string/summary_rank_label"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/rank_in_summary"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="@string/input_log_item_co2_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/co2_in_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:text="@string/input_log_item_co2_amount"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- 節約金額 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal" >
 
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="@string/input_log_item_money_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/monery_in_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_log_item_money_amount"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- かけたお金 -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="6dp"
-            android:text="@string/summary_rank_label_after"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-    </LinearLayout>
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal" >
 
-    <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="@string/input_log_item_price_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/price_in_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:text="@string/input_log_item_co2_label"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/input_log_item_price_amount"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/co2_in_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-          android:textColor="@color/white"
-            android:textSize="14sp" />
+        <!--  -->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="6dp"
-            android:text="@string/input_log_item_co2_amount"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
- </LinearLayout>
-
-
-    <!-- 節約金額 -->
-      <LinearLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:text="@string/input_log_item_money_label"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/monery_in_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/input_log_item_money_amount"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-
-      <!-- かけたお金 -->
-            <LinearLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:text="@string/input_log_item_price_label"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/price_in_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/input_log_item_price_amount"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-
-    <!--  -->
-	     <LinearLayout
+        <LinearLayout
             android:id="@+id/wrapper_star"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal" >
 
-              <ImageView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_marginLeft="5dp"
                 android:src="@android:drawable/star_on" />
-
 
             <TextView
                 android:id="@+id/label_of_number_of_star"
@@ -244,26 +260,47 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
-
                 android:textColor="@color/black"
                 android:textSize="14sp" >
             </TextView>
         </LinearLayout>
 
-	     <Button
-	         android:id="@+id/buton_evaluate_it"
-	         style="?android:attr/buttonStyleSmall"
-	         android:layout_width="wrap_content"
-	         android:layout_height="wrap_content"
-	         android:text="@string/buton_evaluate_it"
-	         android:layout_gravity="right"
-	         android:textSize="28sp"
-	          android:drawableLeft="@android:drawable/star_big_on"
-	         >
+        <Button
+            android:id="@+id/buton_evaluate_it"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:drawableLeft="@android:drawable/star_big_on"
+            android:text="@string/buton_evaluate_it"
+            android:textSize="28sp" >
+        </Button>
+    </LinearLayout>
 
-	         </Button>>
+    <LinearLayout
+        android:id="@+id/imagesWrapperRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
 
+        <ImageView
+            android:id="@+id/imageViewRight"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_ichou" />
 
+        <TextView
+            android:id="@+id/CommentScreenNameInListRight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:textSize="14sp" >
+        </TextView>
+    </LinearLayout>
 
-
-</LinearLayout>
+</RelativeLayout>

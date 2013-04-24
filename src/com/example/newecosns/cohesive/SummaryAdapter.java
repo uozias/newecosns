@@ -59,42 +59,53 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 		}
 		SummaryItem item = this.getItem(position);
 
-		//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
-		if(team_resource_id != null && role_self != 0){
-			//自分側チームの時
-			if(item.getTeam_resource_id().equals(team_resource_id)){
-				switch(role_self){
+
+		if(flg_self_only == 1){
+			convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary));
+			//自分のサマリーだけを表示するとき
+
+		}else{
+
+			//自分の今のroleを参照して、自分のチームは自分のロール、相手のチームは自分と対になるロールに設定する
+			if(team_resource_id != null && role_self != 0){
+				//自分側チームの時
+				if(item.getTeam_resource_id().equals(team_resource_id)){
+					switch(role_self){
+						case Constants.KOHAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+							break;
+						case Constants.SENPAI:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+							break;
+						case Constants.RELAXED_ROLE:
+							convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
+							break;
+
+					}
+
+
+				//相手側チーム(というか自分のチーム以外)のとき
+				}else{
+					switch(role_self){
 					case Constants.KOHAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
 						break;
 					case Constants.SENPAI:
-						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
+						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
 						break;
 					case Constants.RELAXED_ROLE:
 						convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
 						break;
 
+					}
+
 				}
-
-
-			//相手側チーム(というか自分のチーム以外)のとき
 			}else{
-				switch(role_self){
-				case Constants.KOHAI:
-					convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_sempai));
-					break;
-				case Constants.SENPAI:
-					convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary_cohesive_kouhai));
-					break;
-				case Constants.RELAXED_ROLE:
-					convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary)); //リラックスのとき
-					break;
-
-				}
+				convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary));
 
 			}
-		}else{
-			convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_summary));
+
+
 
 		}
 
@@ -103,7 +114,8 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 
 
 
-		((TextView)convertView.findViewById(R.id.screen_name_in_summary_fragment)).setText(String.valueOf(item.getScreen_name()));
+
+
 
 		Calendar calendar_now = Calendar.getInstance();
 		calendar_now.setTimeInMillis(item.getTimestamp()); //今の日時

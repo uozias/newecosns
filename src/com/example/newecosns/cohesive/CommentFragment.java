@@ -41,7 +41,6 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -64,10 +63,8 @@ import com.example.newecosns.geomodel.CommentGeoResource;
 import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
-import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.PublicResourceComparatorInverse;
-import com.example.newecosns.utnils.StarCallback;
 import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
@@ -83,6 +80,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 	public String stress_now = StressItem.DEFAULT;
+
+	//リソース
+	Resources res = null;
 
 
 	//IPPユーザデータ
@@ -136,8 +136,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	Button previous_month = null;
 
 	EditText twTx = null;
-	CohesiveCommentAdapter adapter = null;
-
+	//CohesiveCommentAdapter adapter = null;
+	CommentAdapter adapter = null;
 
 	private AlertDialog dateDialog = null;
 	DatePicker datePicker = null;
@@ -180,21 +180,24 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	public void onStart() {
 		super.onStart();
 
+
+		res = getResources();
+
 		listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView
 		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
 
 		calendar = Calendar.getInstance();
 
 
-
 		//IPPログインチェック
-
 		loginChecked = new CountDownLatch(1);
 		ippLoginCheck();
 
+		//アダプタの準備
 		try {
 			loginChecked.await(); //ログインが終わるまで待つ
-			adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
+			//adapter = new CohesiveCommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self);
+			adapter = new CommentAdapter(getSherlockActivity(), new ArrayList<CommentItem>(), team_resource_id, role_self, ipp_auth_key);
 
 		} catch (InterruptedException e1) {
 
@@ -292,6 +295,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 	    loginChecked.countDown(); //ログイン終了を見てるラッチ
 	    return;
+
 	}
 
 
@@ -417,10 +421,14 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 					commentItem.setCommentScreenName(ipp_screen_name);
 
 					//緯度経度精度
-					//commentItem.setLongitude(mNowLocation.getLongitude());
-					//commentItem.setLatitude(mNowLocation.getLatitude());
-					//commentItem.setAccuracy(mNowLocation.getAccuracy());
-					//commentItem.setProvider(mNowLocation.getProvider());
+					/*
+					if(mNowLocation != null){
+						commentItem.setLongitude(mNowLocation.getLongitude());
+						commentItem.setLatitude(mNowLocation.getLatitude());
+						commentItem.setAccuracy(mNowLocation.getAccuracy());
+						commentItem.setProvider(mNowLocation.getProvider());
+					}
+					*/
 
 					//チームid
 					commentItem.setTeam_resource_id(team_resource_id);
@@ -447,7 +455,6 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 						geo_location.setTimestamp(mNowLocation.getTime());
 
 						geo_location.setProvider(mNowLocation.getProvider());
-
 					}
 
 
@@ -472,7 +479,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 
-					}
+				}
 
 
 			}
@@ -498,22 +505,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
 				((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
 
-				//GEO Resourceを使うのでいらない
-				/*
-				IPPGeoLocation geo_location = new IPPGeoLocation();
-				geo_location.setLongitude(mNowLocation.getLongitude());
-				geo_location.setLatitude(mNowLocation.getLatitude());
-				geo_location.setAccuracy(mNowLocation.getAccuracy());
-				geo_location.setTimestamp(mNowLocation.getTime());
 
-				geo_location.setProvider(mNowLocation.getProvider());
-				geo_location.setResource_id(resource_id);
-
-
-				IPPGeoLocationClient geo_location_client = new IPPGeoLocationClient(getSherlockActivity());
-				geo_location_client.setAuthKey(ipp_auth_key);
-				geo_location_client.create(geo_location, new geoPostCallback());
-				*/
 
 				showCommentList(target_year, target_month, 0, near);
 
@@ -572,15 +564,6 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -782,6 +765,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 			client.query(CommentGeoResource.class ,condition, new CommentGeoGetCallback());
 
 
+		}else{
+			Toast.makeText(getSherlockActivity(), res.getString(R.string.message_network_disabled), Toast.LENGTH_SHORT).show();
+
 		}
 
 
@@ -853,6 +839,8 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/*
+
 	public class CohesiveCommentAdapter extends ArrayAdapter<CommentItem> {
 		private LayoutInflater mInflater;
 		private Context context;
@@ -909,6 +897,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
 							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
 							((TextView) convertView.findViewById(R.id.CommentScreenNameInListLeft)).setText(item.getCommentScreenName());
+							//TODO アイコンのセット
 							break;
 						case Constants.SENPAI:
 							convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_sennpai));
@@ -916,13 +905,13 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 							convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
 							convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
 							((TextView) convertView.findViewById(R.id.CommentScreenNameInListRight)).setText(item.getCommentScreenName());
-							break;
-						/*
-						case Constants.RELAXED_ROLE:
-							convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+							//TODO アイコンのセット
 							break;
 
-						*/
+						//case Constants.RELAXED_ROLE:
+						//	convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+						//	break;
+
 
 					}
 				//相手側チーム(というか自分のチーム以外)のとき
@@ -934,6 +923,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.GONE);
 						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.VISIBLE);
 						((TextView) convertView.findViewById(R.id.CommentScreenNameInListRight)).setText(item.getCommentScreenName());
+						//TODO アイコンのセット
 						break;
 					case Constants.SENPAI:
 						convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_cohesive_kouhai));
@@ -941,12 +931,14 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 						convertView.findViewById(R.id.imagesWrapperRight).setVisibility(View.GONE);
 						convertView.findViewById(R.id.imagesWrapperLeft).setVisibility(View.VISIBLE);
 						((TextView) convertView.findViewById(R.id.CommentScreenNameInListLeft)).setText(item.getCommentScreenName());
+						//TODO アイコンのセット
+
 						break;
-					/*
-					case Constants.RELAXED_ROLE:
-						convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
-						break;
-					*/
+
+					//case Constants.RELAXED_ROLE:
+					//	convertView.findViewById(R.id.wrapper_comment_fuki).setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_row_comment_relaxed)); //リラックスのとき
+					//	break;
+
 					}
 
 				}
@@ -1055,6 +1047,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 
+
 	public class setReplyTarget implements View.OnClickListener {
 		CommentItem item = null;
 
@@ -1088,6 +1081,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 
 	}
+*/
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1101,13 +1095,13 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-		//TODO 自動生成されたメソッド・スタブ
+
 
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		//TODO 自動生成されたメソッド・スタブ
+
 
 	}
 

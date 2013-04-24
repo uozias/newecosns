@@ -15,7 +15,6 @@ import com.example.newecosns.cohesive.CommentFragment;
 import com.example.newecosns.cohesive.OthersLogFragment;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.relaxed.MixedTimelineFragment;
-import com.example.newecosns.relaxed.SummaryFragment;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.TabListener;
 

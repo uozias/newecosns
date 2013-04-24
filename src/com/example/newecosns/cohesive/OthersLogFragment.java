@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient.QueryCondition;
@@ -36,6 +37,7 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -50,9 +52,13 @@ import com.example.newecosns.models.PEBItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.ProductItem;
 import com.example.newecosns.models.SummaryItem;
+import com.example.newecosns.utnils.NetworkManager;
 
 
 public class OthersLogFragment extends SherlockFragment {
+
+	//リソース
+	Resources res = null;
 
 	//デバッグ用タグ
 	String TAG = "OthersLogFragment";
@@ -121,6 +127,13 @@ public class OthersLogFragment extends SherlockFragment {
 	private long since;
 	private long until;
 
+	//配列をリストに変換
+	List<SummaryItem> summary_item_list = null;
+	SummaryAdapter summary_adapter = null;
+
+	//ログインチェック用のラッチ
+		private CountDownLatch loginChecked;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -145,6 +158,7 @@ public class OthersLogFragment extends SherlockFragment {
 		super.onStart();
 
 
+		res = getResources();
 
 		//wait_bar = (ProgressBar) getSherlockActivity().findViewById(R.id.waitBarInLogList);
 		wait_bar_summary = (ProgressBar) getSherlockActivity().findViewById(R.id.waitBarInSummaryList);
@@ -154,7 +168,20 @@ public class OthersLogFragment extends SherlockFragment {
 		//prepareTypeList();
 
 		//ログインチェック
+		loginChecked = new CountDownLatch(1);
 		IPPLoginCheck();
+
+		//アダプタの準備
+		try {
+			loginChecked.await(); //ログインが終わるまで待つ
+			summary_adapter = new SummaryAdapter(getSherlockActivity(),  new ArrayList<SummaryItem>(), team_resource_id, role_self, ipp_auth_key);
+			//アダプタのインスタンス作成時にteam_resource_idがないと困る
+		} catch (InterruptedException e1) {
+
+			Log.d(TAG,e1.toString());
+		}
+
+
 
         //登録ずみ家計簿リスティング
 		showLogAndSummaryList(0,0, 0);
@@ -283,7 +310,7 @@ public class OthersLogFragment extends SherlockFragment {
 	      this.pair_item_list = (List<PairItem>)localObjectMapper.readValue(this.pair_item_list_string, new TypeReference<ArrayList<PairItem>>(){});
 	      if (this.ipp_auth_key.equals(""))
 	        startActivityForResult(new Intent(getSherlockActivity(), IPPLoginActivity.class), MainActivity.REQUEST_IPP_LOGIN);
-	      return;
+
 	    }
 	    catch (JsonParseException localJsonParseException)
 	    {
@@ -300,6 +327,9 @@ public class OthersLogFragment extends SherlockFragment {
 	      while (true)
 	        Log.d(this.TAG, localIOException.toString());
 	    }
+
+	    loginChecked.countDown(); //ログイン終了を見てるラッチ
+	    return;
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -331,41 +361,48 @@ public class OthersLogFragment extends SherlockFragment {
 		QueryCondition condition = new QueryCondition();
 		condition.setCount(10);
 
-		//adapter.clear()
+
+		if(NetworkManager.isConnected(getActivity().getApplicationContext())){
+			summary_adapter.clear();
 
 
-		//読みだすデータの日時の範囲を指定
-		int year = 0;
-		int month = 0;
+			//読みだすデータの日時の範囲を指定
+			int year = 0;
+			int month = 0;
 
-		if(target_month == 0 && target_year == 0){
-			//今月1日のUNIXタイムスタンプ(ミリ秒)を取得
-			year = calendar.get(Calendar.YEAR);
-			month = calendar.get(Calendar.MONTH);
-			calendar.set(year, month, 1, 0, 0, 0);
+			if(target_month == 0 && target_year == 0){
+				//今月1日のUNIXタイムスタンプ(ミリ秒)を取得
+				year = calendar.get(Calendar.YEAR);
+				month = calendar.get(Calendar.MONTH);
+				calendar.set(year, month, 1, 0, 0, 0);
 
-			since = calendar.getTimeInMillis(); //今月頭から
-			until = System.currentTimeMillis(); //現在まで
+				since = calendar.getTimeInMillis(); //今月頭から
+				until = System.currentTimeMillis(); //現在まで
 
 
 
-		}else{//月と日を指定されたら
-			year = target_year;
-			calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
-			since = calendar.getTimeInMillis();
-			calendar.add(Calendar.MONTH, 1);
-			until = calendar.getTimeInMillis(); //次の月の1日まで
-			calendar.add(Calendar.MONTH, -1); //戻しとく
+			}else{//月と日を指定されたら
+				year = target_year;
+				calendar.set(year, target_month, 1, 0, 0, 0); //指定月の1日から
+				since = calendar.getTimeInMillis();
+				calendar.add(Calendar.MONTH, 1);
+				until = calendar.getTimeInMillis(); //次の月の1日まで
+				calendar.add(Calendar.MONTH, -1); //戻しとく
 
+
+			}
+
+			condition.setSince(since);
+			condition.setUntil(until);
+			condition.eq("pair_common_id",pair_common_id);
+
+			condition.build();
+			public_resource_client.query(SummaryItem.class,condition, new SummaryGetCallback());
+
+		}else{
+			Toast.makeText(getSherlockActivity(), res.getString(R.string.message_network_disabled), Toast.LENGTH_SHORT).show();
 
 		}
-
-		condition.setSince(since);
-		condition.setUntil(until);
-		condition.eq("pair_common_id",pair_common_id);
-
-		condition.build();
-		public_resource_client.query(SummaryItem.class,condition, new SummaryGetCallback());
 
 	}
 
@@ -385,9 +422,10 @@ public class OthersLogFragment extends SherlockFragment {
 
 			//配列をリストに変換
 			List<SummaryItem> summary_item_list = new ArrayList<SummaryItem>(Arrays.asList(summary_item_array));
+			for (SummaryItem summaryItem:summary_item_list){
+				summary_adapter.add(summaryItem);;
 
-
-			SummaryAdapter summary_adapter = new SummaryAdapter(getSherlockActivity(), summary_item_list, team_resource_id, role_self, ipp_auth_key);
+			}
 
 			try{
 				list_of_summary.setAdapter(summary_adapter);

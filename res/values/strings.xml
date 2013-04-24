@@ -110,5 +110,6 @@
 	<string name="buton_evaluate_it">評価する</string>
 	<string name="near">この近くだけ表示</string>
 	<string name="near_cancel">近く以外も表示</string>
+	<string name="message_network_disabled">圏外です。</string>
 
 </resources>

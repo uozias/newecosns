@@ -96,6 +96,9 @@ import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class InputLogActivity extends SherlockFragmentActivity implements TwLoaderCallbacks, LocationListener {
 
+	//リソース
+	Resources res = null;
+
 	String TAG = "inputLogActivity";
 
 	//twitter関連
@@ -1365,12 +1368,13 @@ public class InputLogActivity extends SherlockFragmentActivity implements TwLoad
 
 			//位置情報用リソース
 			IPPGeoLocation geo_location = new IPPGeoLocation();
-			geo_location.setLongitude(mNowLocation.getLongitude());
-			geo_location.setLatitude(mNowLocation.getLatitude());
-			geo_location.setAccuracy(mNowLocation.getAccuracy());
-			geo_location.setTimestamp(mNowLocation.getTime());
-			geo_location.setProvider(mNowLocation.getProvider());
-
+			if(mNowLocation != null){
+				geo_location.setLongitude(mNowLocation.getLongitude());
+				geo_location.setLatitude(mNowLocation.getLatitude());
+				geo_location.setAccuracy(mNowLocation.getAccuracy());
+				geo_location.setTimestamp(mNowLocation.getTime());
+				geo_location.setProvider(mNowLocation.getProvider());
+			}
 
 			List<IPPGeoLocation> geoLocations = new ArrayList();
 			geoLocations.add(geo_location) ;

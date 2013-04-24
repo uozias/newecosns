@@ -1,4 +1,4 @@
-package com.example.newecosns.relaxed;
+package com.example.newecosns;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,10 +33,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.example.newecosns.IPPLoginActivity;
-import com.example.newecosns.InputLogActivity;
-import com.example.newecosns.LogAdapter;
-import com.example.newecosns.MainActivity;
 import com.example.newecosns.R;
 import com.example.newecosns.cohesive.SummaryAdapter;
 import com.example.newecosns.models.LogItem;
@@ -47,6 +43,8 @@ import com.example.newecosns.utnils.PEBListAccessor;
 
 
 public class SummaryFragment extends SherlockFragment  {
+	//リソース
+	Resources res = null;
 
 	//デバッグ用タグ
 	String TAG = "summaryFragment";

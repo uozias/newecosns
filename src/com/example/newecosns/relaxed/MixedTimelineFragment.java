@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import jp.innovationplus.ipp.client.IPPApplicationResourceClient;
-import jp.innovationplus.ipp.client.IPPGeoLocationClient;
 import jp.innovationplus.ipp.client.IPPGeoResourceClient;
 import jp.innovationplus.ipp.client.IPPGeoResourceClient.QueryCondition;
 import jp.innovationplus.ipp.core.IPPQueryCallback;
@@ -24,7 +23,6 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
-import twitter4j.Status;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -41,8 +39,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,9 +76,8 @@ import com.example.newecosns.models.StressItem;
 import com.example.newecosns.utnils.ImageCache;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.PublicResourceComparator;
-import com.example.newecosns.utnils.TweetTaskLoader;
-
-public class MixedTimelineFragment extends SherlockFragment implements LoaderCallbacks<Status>, LocationListener  {
+public class MixedTimelineFragment extends SherlockFragment implements  LocationListener  {
+//public class MixedTimelineFragment extends SherlockFragment implements LoaderCallbacks<Status>, LocationListener  {
 	static final String CALLBACK = "http://sns.uozias.jp";
 	static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
 	static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
@@ -288,6 +283,55 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 
 	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//twitterログインチェック
+	public void checkLoginTwitter() {
+		pref = getSherlockActivity().getSharedPreferences("t4jdata", Context.MODE_PRIVATE);
+		token = pref.getString("token", "");
+		token_secret = pref.getString("token_secret", "");
+		screen_name = pref.getString("screen_name", "");
+		user_id = pref.getLong("user_id", 0L);
+		if (token.length() == 0) { //もし未認証だったら
+			Intent intent = new Intent(getSherlockActivity(), OAuthActivity.class);
+			intent.putExtra(OAuthActivity.CALLBACK, CALLBACK);
+			intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
+			intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+			startActivityForResult(intent, REQUEST_OAUTH);
+		}
+
+	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//ログイン用アクティビティから戻ってくるデータを保存
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == REQUEST_OAUTH && resultCode == 200) {
+			user_id = data.getLongExtra(OAuthActivity.USER_ID, 0);
+			screen_name = data.getStringExtra(OAuthActivity.SCREEN_NAME);
+
+			token = data.getStringExtra(OAuthActivity.TOKEN);
+			token_secret = data.getStringExtra(OAuthActivity.TOKEN_SECRET);
+			//認証データ保存
+			editor = pref.edit();
+			editor.putString("token", token);
+			editor.putString("token_secret", token_secret);
+			editor.putString("screen_name", screen_name);
+			editor.putLong("user_id", user_id);
+
+			editor.commit();
+
+		}
+
+		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
+		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
+		  }
+	}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//ツイートする チェックボックスをタップしたら
 	/*
@@ -416,31 +460,61 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 						commentItem.setCommentScreenName(ipp_screen_name);
 
 						//緯度経度精度
+						/*
 						commentItem.setLongitude(mNowLocation.getLongitude());
 						commentItem.setLatitude(mNowLocation.getLatitude());
 						commentItem.setAccuracy(mNowLocation.getAccuracy());
 						commentItem.setProvider(mNowLocation.getProvider());
+						*/
 
 						//チームid
 						commentItem.setTeam_resource_id(team_resource_id);
 						commentItem.setPair_common_id(pair_common_id);
 
 
+
+
 						//返信
 						TextView comment_parent_id_new = (TextView) MixedTimelineFragment.this.getSherlockActivity().findViewById(R.id.CommentParentIdNew);
 						commentItem.setCommentParentResourceId(comment_parent_id_new.getText().toString());
 
+
+
+						//位置情報用リソース
+						IPPGeoLocation geo_location = new IPPGeoLocation();
+						if(mNowLocation != null){
+							geo_location.setLongitude(mNowLocation.getLongitude());
+							geo_location.setLatitude(mNowLocation.getLatitude());
+							geo_location.setAccuracy(mNowLocation.getAccuracy());
+							geo_location.setTimestamp(mNowLocation.getTime());
+
+							geo_location.setProvider(mNowLocation.getProvider());
+						}
+
+						List<IPPGeoLocation> geoLocations = new ArrayList();
+						geoLocations.add(geo_location) ;
+
+						CommentGeoResource resource= new CommentGeoResource();
+						resource.setResource(commentItem);
+						resource.setGeolocations(geoLocations);
+
+						IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
+						client.setAuthKey(ipp_auth_key);
+						client.setDebugMessage(true);
+						client.create(CommentGeoResource.class, resource, new SendCommentCallback());
+
+						/*
 						//送信
 						IPPApplicationResourceClient client = new IPPApplicationResourceClient(getSherlockActivity());
 						client.setAuthKey(ipp_auth_key);
 						client.setDebugMessage(true);
 						client.create(CommentItem.class, commentItem, new SendCommentCallback());
-						}
+
+						*/
+
+					}
 
 
-
-
-					//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//debug
 
 				}
 
@@ -448,59 +522,12 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//ログインチェック
-	public void checkLoginTwitter() {
-		pref = getSherlockActivity().getSharedPreferences("t4jdata", Context.MODE_PRIVATE);
-		token = pref.getString("token", "");
-		token_secret = pref.getString("token_secret", "");
-		screen_name = pref.getString("screen_name", "");
-		user_id = pref.getLong("user_id", 0L);
-		if (token.length() == 0) { //もし未認証だったら
-			Intent intent = new Intent(getSherlockActivity(), OAuthActivity.class);
-			intent.putExtra(OAuthActivity.CALLBACK, CALLBACK);
-			intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-			intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
-			startActivityForResult(intent, REQUEST_OAUTH);
-		}
-
-	}
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//ログイン用アクティビティから戻ってくるデータを保存
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		if (requestCode == REQUEST_OAUTH && resultCode == 200) {
-			user_id = data.getLongExtra(OAuthActivity.USER_ID, 0);
-			screen_name = data.getStringExtra(OAuthActivity.SCREEN_NAME);
-
-			token = data.getStringExtra(OAuthActivity.TOKEN);
-			token_secret = data.getStringExtra(OAuthActivity.TOKEN_SECRET);
-			//認証データ保存
-			editor = pref.edit();
-			editor.putString("token", token);
-			editor.putString("token_secret", token_secret);
-			editor.putString("screen_name", screen_name);
-			editor.putLong("user_id", user_id);
-
-			editor.commit();
-
-		}
-
-		 if ((requestCode == MainActivity.REQUEST_IPP_LOGIN) && (resultCode == 200)){
-		      startActivity(new Intent(getSherlockActivity(), MainActivity.class));
-		  }
-	}
-
 
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//ツイート用コールバック
-
+/*
 	@Override
 	public Loader<Status> onCreateLoader(int arg0, Bundle arg1) {
 		String tweetContent = arg1.getString("tweetContent");
@@ -536,6 +563,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 
 
 	}
+	*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //コメント送信後のコールバック
@@ -556,17 +584,7 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 			imm.hideSoftInputFromWindow(twTx.getWindowToken(), 0);
 			((TextView) getSherlockActivity().findViewById(R.id.editText)).setText("");
 
-			IPPGeoLocation geo_location = new IPPGeoLocation();
-			geo_location.setLongitude(mNowLocation.getLongitude());
-			geo_location.setLatitude(mNowLocation.getLatitude());
-			geo_location.setAccuracy(mNowLocation.getAccuracy());
-			geo_location.setTimestamp(mNowLocation.getTime());
-			geo_location.setProvider(mNowLocation.getProvider());
-			geo_location.setResource_id(resource_id);
 
-			IPPGeoLocationClient geo_location_client = new IPPGeoLocationClient(getSherlockActivity());
-			geo_location_client.setAuthKey(ipp_auth_key);
-			geo_location_client.create(geo_location, new geoPostCallback());
 
 			showMixedList(target_year, target_month, 0, near);
 
@@ -575,22 +593,8 @@ public class MixedTimelineFragment extends SherlockFragment implements LoaderCal
 	}
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//位置情報送信後のコールバック
-class geoPostCallback implements IPPQueryCallback<String> {
-
-@Override
-	public void ippDidError(int arg0) {
-		Log.d(TAG, getString(arg0));
-
-	}
 
 
-	@Override
-	public void ippDidFinishLoading(String arg0) {
-		Log.d(TAG, arg0);
-	}
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -814,6 +818,9 @@ class geoPostCallback implements IPPQueryCallback<String> {
 
 
 
+
+		}else{
+			Toast.makeText(getSherlockActivity(), res.getString(R.string.message_network_disabled), Toast.LENGTH_SHORT).show();
 
 		}
 
@@ -1254,6 +1261,10 @@ class geoPostCallback implements IPPQueryCallback<String> {
 		       .setNegativeButton(android.R.string.cancel, null)
 		       .create();
 	}
+
+
+
+
 
 }
 

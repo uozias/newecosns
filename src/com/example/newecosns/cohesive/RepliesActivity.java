@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.newecosns.IPPLoginActivity;
 import com.example.newecosns.R;
@@ -27,6 +29,10 @@ import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 
 public class RepliesActivity extends Activity {
+
+
+	//リソース
+	Resources res = null;
 
 	private String TAG = "RepliesActivity";
 
@@ -62,6 +68,7 @@ public class RepliesActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_replies);
 
+		res = getResources();
 
 
 		 /*
@@ -102,7 +109,15 @@ public class RepliesActivity extends Activity {
 		listView.setAdapter(adapter);
 
 		//ippサーバから全やり取りのデータをとってくるメソッド
-    	getReplyTarget(CommentResourceId);
+
+		if(NetworkManager.isConnected(getApplicationContext())){
+			getReplyTarget(CommentResourceId);
+
+		}else{
+			Toast.makeText(this, res.getString(R.string.message_network_disabled), Toast.LENGTH_SHORT).show();
+
+		}
+
     	//getReplyTarget(CommentParentResourceId);
 
 		//コメントフラグメントに戻る処理
