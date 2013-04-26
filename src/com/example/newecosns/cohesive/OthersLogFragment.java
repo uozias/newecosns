@@ -49,6 +49,7 @@ import com.example.newecosns.InputLogActivity;
 import com.example.newecosns.LogAdapter;
 import com.example.newecosns.MainActivity;
 import com.example.newecosns.R;
+import com.example.newecosns.SummaryAdapter;
 import com.example.newecosns.models.PEBItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.ProductItem;

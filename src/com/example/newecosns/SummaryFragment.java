@@ -34,7 +34,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.example.newecosns.R;
-import com.example.newecosns.cohesive.SummaryAdapter;
 import com.example.newecosns.models.LogItem;
 import com.example.newecosns.models.PEBItem;
 import com.example.newecosns.models.SummaryItem;

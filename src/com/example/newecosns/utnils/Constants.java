@@ -18,16 +18,24 @@ public class  Constants{
 	public static final int STRESS_DEFAULT =COHESIVE;
 
 	//peb place tag
-	public static String INNDOOR  = "indoor";
-	public static String OUTDOOR = "outdoor";
-	public static String PURCHASE = "purchase";
+	public static final String INNDOOR  = "indoor";
+	public static final String OUTDOOR = "outdoor";
+	public static final String PURCHASE = "purchase";
 
 
+	//Twitter関連データ
+	public static final String CALLBACK = "http://sns.uozias.jp";
+	public static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
+	public static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
+	public static final String hash_tag = "ecosns_test";
 
+	//GCMのセンダーid
+	public static final String SENDERID ="399376059950";
+
+
+	//エコ関連マーク
 	private String[] array = new String[7];
 	private List<MarkItem> MarkList = new ArrayList<MarkItem>();
-
-
 
 	public List<MarkItem> getMarkList() {
 

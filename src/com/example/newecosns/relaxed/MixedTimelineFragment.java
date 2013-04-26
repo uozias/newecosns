@@ -722,7 +722,7 @@ public class MixedTimelineFragment extends SherlockFragment implements  Location
 		progressBarList = new HashMap<String, ProgressBar>();
 
 		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
-		listView = (ListView) MixedTimelineFragment.this.getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView //commentFragmtnの使い回し
+		listView = (ListView) MixedTimelineFragment.this.getSherlockActivity().findViewById(R.id.comment_list2);//自分で用意したListView //commentFragmtnの使い回し
 		calendar = Calendar.getInstance();
 
 		IPPPublicResourceList = new ArrayList<IPPApplicationResource>();

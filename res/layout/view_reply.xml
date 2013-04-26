@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/view_reply"
     android:orientation="horizontal" >
 
     <LinearLayout
@@ -53,9 +54,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:minLines="2"
+             android:hint="@string/text_reply_hint"
             android:background="@color/white"
-            android:inputType="textMultiLine"
-            android:singleLine="false" >
+
+             >
 
             <requestFocus />
         </EditText>

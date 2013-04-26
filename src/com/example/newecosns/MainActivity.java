@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,9 +19,10 @@ import com.example.newecosns.cohesive.CommentFragment;
 import com.example.newecosns.cohesive.OthersLogFragment;
 import com.example.newecosns.models.StressItem;
 import com.example.newecosns.relaxed.MixedTimelineFragment;
+import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.TabListener;
-
+import com.google.android.gcm.GCMRegistrar;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -31,12 +33,9 @@ public class MainActivity extends SherlockFragmentActivity {
 	SharedPreferences tw_pref;
 	SharedPreferences.Editor tw_editor;
 
-	//Twitter関連データ
-	static final String CALLBACK = "http://sns.uozias.jp";
-	static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
-	static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
+
 	static final int REQUEST_OAUTH = 1;
-	static final String hash_tag = "ecosns_test";
+
 	protected static final String TAG = "MainActivity";
 
 	private static long user_id=0L;
@@ -64,6 +63,8 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	private com.actionbarsherlock.app.SherlockFragmentActivity fm = null;
 
+	//リソース
+	Resources res = null;
 
 
 	Intent i = null;
@@ -85,7 +86,17 @@ public class MainActivity extends SherlockFragmentActivity {
 
 		this.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+		res = getResources();
 
+		//プッシュ通信準備
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
+		final String regId = GCMRegistrar.getRegistrationId(this);
+		if (regId.equals("")) {
+		  GCMRegistrar.register(this, Constants.SENDERID);
+		} else {
+		  Log.v(TAG, "Already registered");
+		}
 
 		/*
 		i = getIntent();

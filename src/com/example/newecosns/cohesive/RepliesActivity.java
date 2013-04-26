@@ -160,10 +160,13 @@ public class RepliesActivity extends Activity {
 				CommentItem commentItem = comment_item;
 				adapter.add(commentItem);
 				//もし親がいたらもう一周
-				if(commentItem.getCommentParentResourceId().length() > 0){
+				if(commentItem.getCommentParentResourceId() != null){
+					if(commentItem.getCommentParentResourceId().length() > 0){
 
-					getReplyTarget(commentItem.getCommentParentResourceId());
+						getReplyTarget(commentItem.getCommentParentResourceId());
+					}
 				}
+
 
 			}
 

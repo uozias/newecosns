@@ -4,49 +4,44 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <!-- 月選択メニュー -->
+    <!-- と先輩・後輩表示 -->
 
-      <!-- 月選択メニュー -->
-      <!--  と先輩・後輩表示 -->
-
-     <RelativeLayout
+    <RelativeLayout
         android:id="@+id/top_control_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-
-        >
+        android:layout_weight="0"
+		android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp" >
 
         <TextView
             android:id="@+id/label_senpai"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/name_role_kouhai"
-            android:background="@drawable/bg_label_kouhai"
-            android:layout_margin="4dp"
             android:layout_alignParentLeft="true"
-             android:textSize="22sp" />
-
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_label_kouhai"
+            android:text="@string/name_role_kouhai"
+            android:textSize="22sp" />
 
         <Button
             android:id="@+id/summary_month"
             android:layout_width="48dp"
             android:layout_height="34dp"
+            android:layout_centerHorizontal="true"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/button_this_month"
-            android:layout_centerHorizontal="true"
             android:text="@string/this_month"
             android:textSize="22sp" />
 
-                <Button
+        <Button
             android:id="@+id/previous_month"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_toLeftOf="@id/summary_month"
             android:background="@drawable/button_left" />
-
 
         <Button
             android:id="@+id/next_month"
@@ -64,41 +59,69 @@
             android:layout_margin="4dp"
             android:background="@drawable/bg_label_senpai"
             android:text="@string/name_role_senpai"
-             android:textSize="22sp" />
-
+            android:textSize="22sp" />
     </RelativeLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
+        android:layout_weight="1"
+        android:id="@+id/comment_list_wrapper"
         android:orientation="vertical" >
 
-
-
         <ListView
-            android:id="@+id/comment_list"
-            android:layout_width="fill_parent"
+            android:id="@+id/comment_list2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
 
         <TextView
             android:id="@android:id/empty"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/no_data"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
+        <ProgressBar
+            android:id="@+id/ProgressBarInCommentList"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal" />
+    </LinearLayout>
 
-           <ProgressBar
-        android:id="@+id/ProgressBarInCommentList"
-        style="?android:attr/progressBarStyleLargeInverse"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal" />
+        android:id="@+id/wrapper_submit_comment2"
+ 		android:layout_weight="0"
+
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:lines="2"
+            android:hint="@string/text_comment_hint"
+           />
+
+
+        <Button
+            android:id="@+id/tweetBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_post_comment" />
 
     </LinearLayout>
+
+
+    <!-- 隠しビュー  -->
 
     <TextView
         android:id="@+id/reply_for"
@@ -115,38 +138,5 @@
         android:background="@color/orange"
         android:gravity="center_horizontal"
         android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-		android:text="@string/instruction_input_comment"
-        android:ems="10"
-        android:lines="2" >
-    </EditText>
-
-    <Button
-        android:id="@+id/tweetBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_post_comment" />
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <CheckBox
-            android:id="@+id/check_tweet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:gravity="center"
-            android:visibility="gone"
-            android:text="@string/check_tweet" />
-
-
-    </LinearLayout>
 
 </LinearLayout>

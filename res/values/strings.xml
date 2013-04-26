@@ -112,5 +112,8 @@
 	<string name="near_cancel">近く以外も表示</string>
 	<string name="message_network_disabled">圏外です。</string>
 	<string name="label_content_reply">返信の内容</string>
+	<string name="button_calcel_reply_to_comment">返信をやめる</string>
+	<string name="text_reply_hint">返信内容を入力</string>
+	<string name="text_comment_hint">投稿内容を入力</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.example.newecosns.cohesive;
+package com.example.newecosns;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.newecosns.R;
 import com.example.newecosns.models.SummaryItem;
 import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.StarCallback;
@@ -141,8 +140,9 @@ public class SummaryAdapter extends ArrayAdapter<SummaryItem> {
 		((TextView)convertView.findViewById(R.id.number_in_summary)).setText(String.valueOf(item.getNumber()));
 
 		if(flg_self_only == 1){
-			((TextView)convertView.findViewById(R.id.rank_in_summary)).setVisibility(View.GONE);
+			((View)convertView.findViewById(R.id.wrapper_rank)).setVisibility(View.GONE);
 		}else{
+			((View)convertView.findViewById(R.id.wrapper_rank)).setVisibility(View.VISIBLE);
 			((TextView)convertView.findViewById(R.id.rank_in_summary)).setText(String.valueOf(item.getRank_of_number()));
 		}
 

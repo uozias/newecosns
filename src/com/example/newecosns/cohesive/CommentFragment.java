@@ -37,7 +37,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -63,16 +62,15 @@ import com.example.newecosns.geomodel.CommentGeoResource;
 import com.example.newecosns.models.CommentItem;
 import com.example.newecosns.models.PairItem;
 import com.example.newecosns.models.StressItem;
+import com.example.newecosns.utnils.Constants;
 import com.example.newecosns.utnils.NetworkManager;
 import com.example.newecosns.utnils.PublicResourceTimestampComparatorInverse;
 import com.example.newecosns.utnils.TwLoaderCallbacks;
 
 public class CommentFragment extends SherlockFragment implements TwLoaderCallbacks,  LocationListener  {
-	static final String CALLBACK = "http://sns.uozias.jp";
-	static final String CONSUMER_KEY = "AJOoyPGkkIRBgmjAtVNw";
-	static final String CONSUMER_SECRET = "1OMzUfMcqy4QHkyT6jJoUyxN4KXEu7R87k3bVOzp8c";
+
 	static final int REQUEST_OAUTH = 1;
-	static final String hash_tag = "ecosns_test";
+
 	private static long user_id = 0L;
 	private static String screen_name = null;
 	private static String token = null;
@@ -180,10 +178,10 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	public void onStart() {
 		super.onStart();
 
+		res = getSherlockActivity().getResources();
 
-		res = getResources();
 
-		listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list);//自分で用意したListView
+		listView = (ListView) getSherlockActivity().findViewById(R.id.comment_list2);//自分で用意したListView
 		waitBar = (ProgressBar) getSherlockActivity().findViewById(R.id.ProgressBarInCommentList);
 
 		calendar = Calendar.getInstance();
@@ -345,29 +343,6 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 	private void prapareCommentSend(){
 
 
-		//入力欄にフォーカスすると内容はきえる
-		twTx = (EditText) getSherlockActivity().findViewById(R.id.editText);
-		twTx.setOnFocusChangeListener( new OnFocusChangeListener() {
-
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				Resources res = getResources();
-				if(((TextView) v).getText().toString().equals(res.getText(R.string.instruction_input_comment))){
-					((TextView) v).setText("");
-					user_inputted = true;
-				}
-
-
-			}
-		});
-		/*)
-		twTx.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((TextView) v).setText("");
-			}
-		});
-		*/
 
 		twBtn = (Button) getSherlockActivity().findViewById(R.id.tweetBtn);
 		twBtn.setOnClickListener(new TapSendCommentListener(twTx,  ipp_id_string,ipp_screen_name,  team_resource_id, pair_common_id, null, mNowLocation));
@@ -392,7 +367,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 				String tweetContent = twTx.getText().toString();
 
-				if (tweetContent.length() == 0 || user_inputted == false) {
+				if (tweetContent.length() == 0 ) {
 					Toast toast2 = Toast.makeText(getSherlockActivity().getApplicationContext(), "文を入力して下さい。",
 							Toast.LENGTH_LONG);
 					toast2.show();
@@ -491,7 +466,7 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 				IPPGeoResourceClient client = new IPPGeoResourceClient(getSherlockActivity().getApplicationContext());
 				client.setAuthKey(ipp_auth_key);
 				client.setDebugMessage(true);
-				client.create(CommentGeoResource.class, resource, new SendCommentCallback());
+				client.create(CommentGeoResource.class, resource, new SendCommentCallback(twTx));
 
 
 		}
@@ -500,6 +475,11 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 	//コメント送信後のコールバック
 		public class SendCommentCallback implements IPPQueryCallback<String> {
+			EditText twTx = null;
+
+			public SendCommentCallback(EditText twTx){
+				this.twTx = twTx;
+			}
 
 			@Override
 			public void ippDidError(int arg0) {
@@ -536,9 +516,9 @@ public class CommentFragment extends SherlockFragment implements TwLoaderCallbac
 
 		if (token.length() == 0) { //もし未認証だったら
 			Intent intent = new Intent(getSherlockActivity(), OAuthActivity.class);
-			intent.putExtra(OAuthActivity.CALLBACK, CALLBACK);
-			intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-			intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+			intent.putExtra(OAuthActivity.CALLBACK, Constants.CALLBACK);
+			intent.putExtra(OAuthActivity.CONSUMER_KEY, Constants.CONSUMER_KEY);
+			intent.putExtra(OAuthActivity.CONSUMER_SECRET, Constants.CONSUMER_SECRET);
 			startActivityForResult(intent, REQUEST_OAUTH);
 		}
 
